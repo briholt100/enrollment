@@ -647,22 +647,20 @@ est.fte<-function(bo=ftes.lm$coef[1], b1=ftes.lm$coef[2], enrolled){
   
 mean(x$classCap[x$Type=="Online"])
 est.enrol(cap=22)
-(Intercept) 
+#(Intercept) 
 19.97257 
 est.enrol(cap=28)
-(Intercept) 
+#(Intercept) 
 21.69442 
 est.fte(enrolled=20)
-(Intercept) 
+#(Intercept) 
 5.191192 
 est.fte(enrolled=21.6)
-(Intercept) 
+#(Intercept) 
 5.570607 
 est.enrol(cap=30)
-(Intercept) 
+#(Intercept) 
 22.84233 
 est.fte(enrolled=23)
-(Intercept) 
+#(Intercept) 
 5.902595 est
-
-just a change
