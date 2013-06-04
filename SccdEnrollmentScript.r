@@ -518,7 +518,7 @@ Enrolled.lme<-lme(SccdEnrollments$Enrolled[cancel=="live"]~A)
 
 FTES.State.lm<-lm(data$FTES.STATE[data$type!="Odd"]~data$cap[data$type!="Odd"]+data$type[data$type!="Odd"])
 
-#Enrolled.lm<-lm(SccdEnrollments$Enrolled~SccdEnrollments$classCap+SccdEnrollments$Type)
+Enrolled.lm<-lm(SccdEnrollments$Enrolled~SccdEnrollments$classCap+SccdEnrollments$Type)
 Enrolled.lm
 Enrolled.lm.resid<-resid(Enrolled.lm)
 plot(fitted(Enrolled.lm))
@@ -608,7 +608,7 @@ points(kmeansObj$centers,col=1:7,pch=3,cex=3,lwd=3)
 
 
 
-
+df<-x
 online.fill.ratio<-x$Enrolled[x$classCap>0 & x$Type=="Online"]/x$classCap[x$classCap>0 & x$Type=="Online"]
 Typical.fill.ratio<-x$Enrolled[x$classCap>0 & x$Type=="Typical"]/x$classCap[x$classCap>0 & x$Type=="Typical"]
 table(1>online.fill.ratio)
@@ -629,6 +629,8 @@ addmargins(table(x$Type))
 boxplot(online.fill.ratio,Typical.fill.ratio, col=c('yellow','blue'),main="Course Fill Ratios\n Online vs Typical",xlab="quanitles")
 legend("topleft", legend=c("Online Courses",'Typical Courses','median'), col=c("yellow","blue",'black'),pch=19, cex=1.1)
 
+x<-df
+enrolled.lm<-lm(x$Enrolled~x$classCap+x$Type)
 est.enrol<-function(bo=enrolled.lm$coef[1], b1=enrolled.lm$coef[2], cap, type=enrolled.lm$coef[4]){
   bo + (b1 * cap) + type
 }
@@ -639,22 +641,22 @@ est.fte<-function(bo=ftes.lm$coef[1], b1=ftes.lm$coef[2], enrolled){
   
   
   
-
-est.enrol(cap=25)
+mean(x$classCap[x$Type=="Online"])
+est.enrol(cap=22)
 (Intercept) 
 19.97257 
-> est.enrol(cap=28)
+est.enrol(cap=28)
 (Intercept) 
 21.69442 
-> est.fte(enrolled=20)
+est.fte(enrolled=20)
 (Intercept) 
 5.191192 
-> est.fte(enrolled=21.6)
+est.fte(enrolled=21.6)
 (Intercept) 
 5.570607 
-> est.enrol(cap=30)
+est.enrol(cap=30)
 (Intercept) 
 22.84233 
-> est.fte(enrolled=23)
+est.fte(enrolled=23)
 (Intercept) 
 5.902595 est
