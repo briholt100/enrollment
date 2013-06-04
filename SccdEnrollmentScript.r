@@ -498,10 +498,14 @@ par(mfrow=c(2,2))
 online.lm<-lm(data$enroll[data$type=="Online"]~data$cap[data$type=="Online"])
 typical.lm<-lm(data$enroll[data$type=="Typical"]~data$cap[data$type=="Typical"])
 hybrid.lm<-lm(data$enroll[data$type=="Hybrid"]~data$cap[data$type=="Hybrid"])
-plot(data$enroll~data$cap,pch=20)
+capEnroll.plot<-plot(data$enroll~data$cap,pch=20)
+capEnroll.plot
 abline(online.lm,col="red")
 abline(typical.lm,col="blue")
 abline(hybrid.lm,col="green")
+legend("topleft", legend=c("Online","Typical","Hybrid"),
+       col=c("red","blue",'green'),pch=19)
+identify(capEnroll.plot)
 par(mfrow=c(1,1))
 
 
