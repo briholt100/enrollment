@@ -58,7 +58,7 @@ def filename_Parser(fileAddress):
     
                         
 
-def file_tidy(f_loc, outfile_store =outfile +"\\" +"TidyEnrollments.csv") :
+def file_tidy(f_loc, outfile_store = outfile +"\\" +"TidyEnrollments.csv") :
     """This definition is longer than necessary, but it works. It creates a new outfile that includes only the raw data, but prefixes these lines with the campus and quarter info from filename_Parser above"""
     import re
     prefix = filename_Parser(f_loc)[0] +" "+ filename_Parser(f_loc)[1]+","+filename_Parser(f_loc)[2] + "," #this takes the output of filename_Parser, which is a list [quarter, year, campus] and front appends to each line of the read-line
