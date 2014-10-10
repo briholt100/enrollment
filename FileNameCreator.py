@@ -44,47 +44,21 @@ def identify_files():#=locationInput()[0]):
 
 
 def xls_to_csv():
-    #This should open each xls and print each file name of that excel but with out ".xls"
+    #this opens xls file, identifies first worksheet, and iterates through each line creating a new file, saved in the original folder of xls files.  a bonus would be to then remove those .xls files. 
     fileInfo=identify_files()
     for file in fileInfo[0]:
         book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
-        sh = book.sheet_by_name()
-        newCSV = open(str(file)[:-3] + "csv", 'wb')
+        sheet = book.sheet_names()[0]
+        worksheet = book.sheet_by_name(sheet)        
+        newCSV = open(fileInfo[1] + "\\" + str(file)[:-3] + "csv", 'wb')
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
-        for rownum in xrange(sh.nrows):
-            wr.writerow(sh.row_values(rownum))
+        for rownum in xrange(worksheet.nrows):
+            wr.writerow(worksheet.row_values(rownum))
         
         newCSV.close()
         
 
 
-"""def csv_from_excel():
-    for file in identify_files()[0]:
-        workbook = xlrd.open_workbook(file)
-        all_worksheets = workbook.sheet_names()[0]
-        for worksheet_name in all_worksheets:
-            #worksheet = workbook.sheet_by_name(worksheet_name)
-            your_csv_file = open(''.join([worksheet_name,'.csv']), 'wb')
-            wr = csv.writer(your_csv_file, quoting=csv.QUOTE_ALL)
-            your_csv_file.close()
-"""
-
-
-
-
-            
-#Open and save .xls as csv using xld
-"""file= open('out.csv', 'wb')
-wr = csv.writer(file, quoting=csv.QUOTE_ALL)
-book=xlrd.open_workbook("F.xls")
-sheet=book.sheet_by_index(0)
-for sheet in book.sheets():
-
-##for alternative, see Andi's post: http://stackoverflow.com/questions/9884353/xls-to-csv-convertor
-
-
-
-#close file
 #open new .csv
 #read appropriate line (maybe just the first 3 lines)
 #pull campus, quarter, year out of appropriate line
