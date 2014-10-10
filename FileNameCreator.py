@@ -24,9 +24,12 @@ http://stackoverflow.com/questions/986006/how-do-i-pass-a-variable-by-reference"
 needs_work=[]
 
 
-#import xlrd
-#import csv
-import os
+
+import xlrd
+import csv
+import os 
+import sys
+
 
 def identify_files():#=locationInput()[0]): 
     """this searches within a directory and returns 0 or more."""
@@ -36,9 +39,40 @@ def identify_files():#=locationInput()[0]):
     for f in file_list:
         if ".xls" in f:
             needs_work.append(f)
-    return (needs_work,in_path) #this returns a list, firs the files (in a list), then the final item is the path
+    return (needs_work,in_path) 
+    #this returns a list with 2 parts: identify_files()[0] = files in a list; identify_files()[1]:  the path
 
 
+def xls_to_csv():
+    #This should open each xls and print each file name of that excel but with out ".xls"
+    fileInfo=identify_files()
+    for file in fileInfo[0]:
+        book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
+        sh = book.sheet_by_name()
+        newCSV = open(str(file)[:-3] + "csv", 'wb')
+        wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
+        for rownum in xrange(sh.nrows):
+            wr.writerow(sh.row_values(rownum))
+        
+        newCSV.close()
+        
+
+
+"""def csv_from_excel():
+    for file in identify_files()[0]:
+        workbook = xlrd.open_workbook(file)
+        all_worksheets = workbook.sheet_names()[0]
+        for worksheet_name in all_worksheets:
+            #worksheet = workbook.sheet_by_name(worksheet_name)
+            your_csv_file = open(''.join([worksheet_name,'.csv']), 'wb')
+            wr = csv.writer(your_csv_file, quoting=csv.QUOTE_ALL)
+            your_csv_file.close()
+"""
+
+
+
+
+            
 #Open and save .xls as csv using xld
 """file= open('out.csv', 'wb')
 wr = csv.writer(file, quoting=csv.QUOTE_ALL)
