@@ -14,12 +14,7 @@ After generating an enrollment report for a given quarter/campus,
 do a copy paste into a worksheet. Do this because
 the 2nd line of the worksheet will contain the campus,
 quarter, year, and date accessed. This can be used to create a file name"""
-""" some resources 
-http://stackoverflow.com/questions/354883/how-do-you-return-multiple-values-in-python
-http://stackoverflow.com/questions/986006/how-do-i-pass-a-variable-by-reference"""
 
-#Identify the folder
-#in_path = ""
 #outPath = raw_input("enter full path for the outfile:----> ")
 needs_work=[]
 
@@ -28,7 +23,7 @@ needs_work=[]
 import xlrd
 import csv
 import os 
-import sys
+#import sys
 
 
 def identify_files():#=locationInput()[0]): 
@@ -54,7 +49,6 @@ def xls_to_csv():
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
             wr.writerow(worksheet.row_values(rownum))
-        
         newCSV.close()
         
 
@@ -64,7 +58,7 @@ def xls_to_csv():
 #pull campus, quarter, year out of appropriate line
 #rename
 #close file
-
+"""
 def make_name(year):
     school = ["Central", "North", "South"]
     quarter = ["Summer", "Fall", "Winter", "Spring"]
