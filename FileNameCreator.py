@@ -23,7 +23,7 @@ needs_work=[]
 import xlrd
 import csv
 import os 
-#import sys
+import re
 
 
 def identify_files():#=locationInput()[0]): 
@@ -45,7 +45,24 @@ def xls_to_csv():
         book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
         sheet = book.sheet_names()[0]
         worksheet = book.sheet_by_name(sheet) 
-        print worksheet.row(1)[0]
+        campusInfo = str(worksheet.row(1)[0])
+        print campusInfo[6:30]        
+#Need to search for either 2012 or 12.  re.search could be 0-9{2} but that would give 3 different values 20 01 12.  I'd want the last 2.  How to start with that?  If could search backwards, the first 2 numbers would always be the correct one. 
+        campusList= ["North","South","Central","SVI"]
+        quarterList = ["FALL","WINTER","SPRING","SUMMER"]
+        yearMatch = re.search("[0-9]{4}",campusInfo) #this command creates an object, requiring the next step below using the .group function
+        year = yearMatch.group(0) #isolates the year
+        print year
+        for c in campusList: #for each item in ["North","South","Central","SVI"]...
+            if c in campusInfo: #then campus will be assigned the value 'c'
+                campus = c
+                print campus
+        for q in quarterList:
+            if q in campusInfo: #then quarter will be assigned the value 'q'
+                quarter = q
+                print quarter
+                quarterCampus = [quarter, year, campus]
+                return quarterCampus
         newCSV = open(fileInfo[1] + "\\" + str(file)[:-3] + "csv", 'wb')
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
