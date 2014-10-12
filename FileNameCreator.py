@@ -44,7 +44,8 @@ def xls_to_csv():
     for file in fileInfo[0]:
         book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
         sheet = book.sheet_names()[0]
-        worksheet = book.sheet_by_name(sheet)        
+        worksheet = book.sheet_by_name(sheet) 
+        print worksheet.row(1)[0]
         newCSV = open(fileInfo[1] + "\\" + str(file)[:-3] + "csv", 'wb')
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
