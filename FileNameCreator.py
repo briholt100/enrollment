@@ -46,13 +46,15 @@ def xls_to_csv():
         sheet = book.sheet_names()[0]
         worksheet = book.sheet_by_name(sheet) 
         campusInfo = str(worksheet.row(1)[0])
-        print campusInfo[6:30]        
-#Need to search for either 2012 or 12.  re.search could be 0-9{2} but that would give 3 different values 20 01 12.  I'd want the last 2.  How to start with that?  If could search backwards, the first 2 numbers would always be the correct one. 
+        campusInfo = campusInfo[6:]   
+        #print campusInfo
+        findColon = re.search(":",campusInfo) #this command creates an object, requiring the next step below using the .group function
+        colon_strt= findColon.start() #isolates the first colon
+        colon_end= findColon.end() #isolates the first colon
+        yr2 = campusInfo[(colon_strt- 3):(colon_end-2)] #returns a 2 digit year code eg, 2012 -> 12
         campusList= ["North","South","Central","SVI"]
         quarterList = ["FALL","WINTER","SPRING","SUMMER"]
-        yearMatch = re.search("[0-9]{4}",campusInfo) #this command creates an object, requiring the next step below using the .group function
-        year = yearMatch.group(0) #isolates the year
-        print year
+        print yr2
         for c in campusList: #for each item in ["North","South","Central","SVI"]...
             if c in campusInfo: #then campus will be assigned the value 'c'
                 campus = c
