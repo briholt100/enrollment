@@ -47,7 +47,7 @@ def xls_to_csv():
         worksheet = book.sheet_by_name(sheet) 
         campusInfo = str(worksheet.row(1)[0])
         campusInfo = campusInfo[6:]   
-        #print campusInfo
+        print campusInfo
         findColon = re.search(":",campusInfo) #this command creates an object, requiring the next step below using the .group function
         colon_strt= findColon.start() #isolates the first colon
         colon_end= findColon.end() #isolates the first colon
@@ -59,10 +59,12 @@ def xls_to_csv():
             if c in campusInfo: #then campus will be assigned the value 'c'
                 campus = c
                 print campus
+                return campus
         for q in quarterList:
             if q in campusInfo: #then quarter will be assigned the value 'q'
                 quarter = q
                 print quarter
+                return quarter
                 quarterCampus = [quarter, yr2, campus]
                 return quarterCampus
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
