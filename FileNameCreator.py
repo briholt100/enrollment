@@ -63,8 +63,10 @@ def xls_to_csv():
             if q in campusInfo: #then quarter will be assigned the value 'q'
                 quarter = q
                 print quarter
-                quarterCampus = [quarter, year, campus]
+                quarterCampus = [quarter, yr2, campus]
                 return quarterCampus
+        #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
+        #This will look like quarterCampus[2] + quarterCampus[0]+ quarterCampus[1]+"Enrollments"
         newCSV = open(fileInfo[1] + "\\" + str(file)[:-3] + "csv", 'wb')
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
