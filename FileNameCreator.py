@@ -46,29 +46,35 @@ def xls_to_csv():
         sheet = book.sheet_names()[0]
         worksheet = book.sheet_by_name(sheet) 
         campusInfo = str(worksheet.row(1)[0])
-        campusInfo = campusInfo[6:]   
+        campusInfo = campusInfo[7:]   
         print campusInfo
         findColon = re.search(":",campusInfo) #this command creates an object, requiring the next step below using the .group function
         colon_strt= findColon.start() #isolates the first colon
         colon_end= findColon.end() #isolates the first colon
         yr2 = campusInfo[(colon_strt- 3):(colon_end-2)] #returns a 2 digit year code eg, 2012 -> 12
-        campusList= ["North","South","Central","SVI"]
-        quarterList = ["FALL","WINTER","SPRING","SUMMER"]
-        print yr2
-        for c in campusList: #for each item in ["North","South","Central","SVI"]...
-            if c in campusInfo: #then campus will be assigned the value 'c'
-                campus = c
-                print campus
-                return campus
-        for q in quarterList:
-            if q in campusInfo: #then quarter will be assigned the value 'q'
-                quarter = q
-                print quarter
-                return quarter
-                quarterCampus = [quarter, yr2, campus]
-                return quarterCampus
+        findHyphen = re.search("-",campusInfo) #this command creates an object, requiring the next step below using the .group function
+        hyphen_end= findHyphen.end() #isolates the first colon
+        quarter = campusInfo[hyphen_end+1:] #This will read the first or 2nd letter of string to determine whether fall or winter, etc.
+        if quarter.lower()[0] =="f":
+            quarter = "Fall"      
+        elif quarter.lower()[0] =="w":
+            quarter = "Winter"      
+        elif quarter.lower()[1] =="p":
+            quarter = "Spring"
+        else:
+            quarter = "Summer"      
+        #same as above but for campus.
+        if campusInfo.lower()[0] =="c":
+            campus = "Central"      
+        elif campusInfo.lower()[0] =="n":
+            campus = "North"      
+        elif campusInfo.lower()[1] =="o":
+            campus = "South"
+        else:
+            campus = "SVI"      
+        print campus  + " in " + quarter + " in year " + yr2
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
-        #This will look like quarterCampus[2] + quarterCampus[0]+ quarterCampus[1]+"Enrollments"
+        #This will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(fileInfo[1] + "\\" + str(file)[:-3] + "csv", 'wb')
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
@@ -82,11 +88,4 @@ def xls_to_csv():
 #pull campus, quarter, year out of appropriate line
 #rename
 #close file
-"""
-def make_name(year):
-    school = ["Central", "North", "South"]
-    quarter = ["Summer", "Fall", "Winter", "Spring"]
-    for college in school:
-        or term in quarter:
-    print college  term  str(year)  "enrollments"
-    """
+
