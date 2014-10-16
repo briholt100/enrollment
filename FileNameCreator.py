@@ -76,21 +76,22 @@ def xls_to_csv():
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
         #This will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv"), 'wb')        
-        prefix = quarter + " " + yr2 + "," + campus + ","
-        print prefix
+        prefix = quarter + " " + yr2 + " " + campus + ","
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
             wr.writerow(worksheet.row_values(rownum))
-        #experimental line
-        newCSV.close()     
-            
-        
-        
+        newCSV.close()
 
-
-#open new .csv
-#read appropriate line (maybe just the first 3 lines)
-#pull campus, quarter, year out of appropriate line
-#rename
-#close file
-
+        #experimental line  The problem below is that it returns an empty file. Line 90:94 works.  Does match?
+        currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
+        outfile_store= os.path.join(fileInfo[1],"final" + campus+quarter+"20"+yr2+"Enrollments.csv")
+        with open(currentFile,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+            while True:
+                line=infile.readline() #this reads each and every line of file into a variable "line"
+                print line
+                line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
+                print line
+                if not line: break
+                match = re.findall("^[0-9]{1,4}",line) #the wanted data in these file begins with a 4 digit item code. No other lines have this bx.
+                if match:
+                    outfile.write(prefix + line) # <<== I must use the fileNameParser to obtain these values. This writes the new string info to the beginning of each wanted line and saves to outfile, which points to the actual output-filename at top of code
