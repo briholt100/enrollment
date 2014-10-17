@@ -31,6 +31,7 @@ def identify_files():#=locationInput()[0]):
     #regarding if statement, maybe include campusList?
     in_path = raw_input("enter full path for location of folder with files needing renaming:----> ")    
     file_list = os.listdir(in_path)
+    os.mkdir(os.path.join(in_path,"processed"),)
     for f in file_list:
         if ".xls" in f:
             needs_work.append(f)
@@ -84,7 +85,7 @@ def xls_to_csv():
 
         #experimental line  The problem below is that it returns an empty file. Line 90:94 works.  Does match?
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
-        outfile_store= os.path.join(fileInfo[1],"final" + campus+quarter+"20"+yr2+"Enrollments.csv")
+        outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
         with open(currentFile,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
             while True:
                 line=infile.readline() #this reads each and every line of file into a variable "line"
