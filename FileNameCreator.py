@@ -88,10 +88,13 @@ def xls_to_csv():
         with open(currentFile,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
             while True:
                 line=infile.readline() #this reads each and every line of file into a variable "line"
-                print line
                 line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
-                print line
+                print line[0:8]
                 if not line: break
-                match = re.findall("^[0-9]{1,4}",line) #the wanted data in these file begins with a 4 digit item code. No other lines have this bx.
-                if match:
+                m = re.match("\"[0-9]{1,4}",line) #the wanted data in these file begins with a 4 digit item code. No other lines have this bx.
+                if m is not None:
+                    print m.group(0)
+               # print m.group(1)
+                #if m:
                     outfile.write(prefix + line) # <<== I must use the fileNameParser to obtain these values. This writes the new string info to the beginning of each wanted line and saves to outfile, which points to the actual output-filename at top of code
+            infile.close()
