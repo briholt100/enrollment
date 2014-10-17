@@ -76,7 +76,7 @@ def xls_to_csv():
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
         #This will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv"), 'wb')        
-        prefix = quarter + " " + yr2 + " " + campus + ","
+        prefix = quarter + " " + yr2 + "," + campus + ","
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
             wr.writerow(worksheet.row_values(rownum))
@@ -89,12 +89,9 @@ def xls_to_csv():
             while True:
                 line=infile.readline() #this reads each and every line of file into a variable "line"
                 line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
-                print line[0:8]
                 if not line: break
                 m = re.match("\"[0-9]{1,4}",line) #the wanted data in these file begins with a 4 digit item code. No other lines have this bx.
                 if m is not None:
-                    print m.group(0)
-               # print m.group(1)
-                #if m:
+                    print line[0:8]
                     outfile.write(prefix + line) # <<== I must use the fileNameParser to obtain these values. This writes the new string info to the beginning of each wanted line and saves to outfile, which points to the actual output-filename at top of code
             infile.close()
