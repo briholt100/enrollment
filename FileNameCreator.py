@@ -15,16 +15,18 @@ do a copy paste into a worksheet. Do this because
 the 2nd line of the worksheet will contain the campus,
 quarter, year, and date accessed. This can be used to create a file name"""
 
-#outPath = raw_input("enter full path for the outfile:----> ")
-needs_work=[]
-
-
-
 import xlrd
 import csv
 import os 
 import re
+needs_work=[]
 
+def cleanUp():
+    in_path = raw_input("enter full path for location to clean:----> ")
+    file_list = os.listdir(in_path)    
+    for f in file_list:
+        if ".csv" in f:
+            os.remove(os.path.join(in_path,f))
 
 def identify_files():#=locationInput()[0]): 
     """this searches within a directory and returns 0 or more."""
@@ -37,7 +39,6 @@ def identify_files():#=locationInput()[0]):
             needs_work.append(f)
     return (needs_work,in_path) 
     #this returns a list with 2 parts: identify_files()[0] = files in a list; identify_files()[1]:  the path
-
 
 def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates through each line creating a new file, saved in the original folder of xls files.  a bonus would be to then remove those .xls files. 
@@ -82,8 +83,6 @@ def xls_to_csv():
         for rownum in xrange(worksheet.nrows):
             wr.writerow(worksheet.row_values(rownum))
         newCSV.close()
-
-        #experimental line  The problem below is that it returns an empty file. Line 90:94 works.  Does match?
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
         with open(currentFile,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
@@ -94,5 +93,5 @@ def xls_to_csv():
                 m = re.match("\"[0-9]{1,4}",line) #the wanted data in these file begins with a 4 digit item code. No other lines have this bx.
                 if m is not None:
                     print line[0:8]
-                    outfile.write(prefix + line) # <<== I must use the fileNameParser to obtain these values. This writes the new string info to the beginning of each wanted line and saves to outfile, which points to the actual output-filename at top of code
+                    outfile.write(prefix + line) # This writes the new string info to the beginning of each wanted line and saves to outfile
             infile.close()
