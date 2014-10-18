@@ -78,7 +78,7 @@ def xls_to_csv():
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
         #This will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv"), 'wb')        
-        prefix = quarter + " " + yr2 + "," + campus + ","
+        prefix = quarter + " " + "20"+yr2 + "," + campus + ","
         wr = csv.writer(newCSV, quoting=csv.QUOTE_ALL)
         for rownum in xrange(worksheet.nrows):
             wr.writerow(worksheet.row_values(rownum))
