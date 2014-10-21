@@ -72,8 +72,11 @@ def xls_to_csv():
             campus = "North"      
         elif campusInfo.lower()[1] =="o":
             campus = "South"
+        elif campusInfo.lower()[1] =="v":
+            campus = "SVI"              
         else:
-            campus = "SVI"      
+            campus = "UNKNOWN"
+        
         print campus  + " in " + quarter + " in year " + yr2
         #the next line will change str(file) into the new filename CampusTermYearEnrollments.csv
         #This will look like quarter + yr2 + campus +"Enrollments"
