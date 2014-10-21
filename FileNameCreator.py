@@ -79,7 +79,7 @@ def xls_to_csv():
         else:
             campus = "UNKNOWN"
         
-        print campus  + " in " + quarter + " in year " + yr2
+        print "What follows are the item numbers from " + campus  + " in " + quarter + " during year " + yr2
         #the next line will change str(file) into the new filename 
             #CampusTermYearEnrollments.csv and will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv"), 'wb')        
@@ -107,11 +107,19 @@ def xls_to_csv():
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
+
+def tidy():
+    in_path = raw_input("enter full path for location of folder with files to tidy:----> ")
+    file_list = os.listdir(in_path)
+    filenames = [ os.path.splitext(f) for f in file_list] #creates a list of file path, extensions
+    CSV = {f for f, e in filenames if e =='.csv' } #creates a dictionary of csv files
+    #outfile_store= os.path.join(in_path,"tidyEnrollments.csv")
+    for file in CSV:     
+        print file
+    print len(file_list)
 #Create/open new file called tidyEnrollments.csv
 #while open, open and thenclose  each file in os.listdir, read each line, then append line to Tidy file
 #close tidyEnrollments.csv
-
-
 
 
 
