@@ -110,16 +110,19 @@ def xls_to_csv():
 
 def tidy():
     in_path = raw_input("enter full path for location of folder with files to tidy:----> ")
-    file_list = os.listdir(in_path)
-    filenames = [ os.path.splitext(f) for f in file_list] #creates a list of file path, extensions
-    CSV = {f for f, e in filenames if e =='.csv' } #creates a dictionary of csv files
-    #outfile_store= os.path.join(in_path,"tidyEnrollments.csv")
-    for file in CSV:     
-        print file
-    print len(file_list)
-#Create/open new file called tidyEnrollments.csv
-#while open, open and thenclose  each file in os.listdir, read each line, then append line to Tidy file
-#close tidyEnrollments.csv
+    file_list = []
+    for f in os.listdir(in_path):
+        if ".csv" in f:
+            file_list.append(f)
+    return file_list
+    outfile_store= os.path.join(in_path,"tidyEnrollments.csv")
+    for file in file_list:
+        with open(file,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+            while True:
+                line=infile.readline() #this reads each and every line of file into a variable "line"
+                outfile.write(line) 
+            infile.close()
+    
 
 
 
