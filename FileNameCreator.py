@@ -79,7 +79,7 @@ def xls_to_csv():
         else:
             campus = "UNKNOWN"
         
-        print "What follows are the item numbers from " + campus  + " in " + quarter + " during year " + yr2
+        print "What follows are the total number of classes from " + campus  + " in " + quarter + " during year " + yr2
         #the next line will change str(file) into the new filename 
             #CampusTermYearEnrollments.csv and will look like quarter + yr2 + campus +"Enrollments"
         newCSV = open(os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv"), 'wb')        
@@ -91,7 +91,9 @@ def xls_to_csv():
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
         with open(currentFile,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+            i=0            
             while True:
+                i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
                 line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
@@ -99,14 +101,15 @@ def xls_to_csv():
                                         #file begins with a 4 digit item code. 
                                         #No other lines have this bx.
                 if m is not None:
-                    print line[0:8]
+
                     outfile.write(prefix + line) # This writes the new string 
                                     #info to the beginning of 
                                     #each wanted line and saves to outfile
+            print i
             infile.close()
+    print "You may now want to consider using cleanUp() to remove CSV files from this directory. Tidy() would be next."
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
-
 
 def tidy():
     tidy_path = raw_input("enter full path for location of folder with files to tidy:----> ")
@@ -120,8 +123,6 @@ def tidy():
                 if not line: break
                 outfile.write(line)
             infile.close()
-
-
 
 def cleanUp():
     in_path = raw_input("enter full path for location to clean:----> ")
