@@ -113,13 +113,11 @@ def tidy():
     file_list = os.listdir(tidy_path)
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
     for file in file_list:
-        #up to this point it works.  
-        with open(file,) as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
-            print infile.readline()            
+        #up to this point it works because file, below, needs.  
+        with open(os.path.join(tidy_path,file),) as infile, open(outfile_store, "a") as outfile: 
             while True:
                 line=infile.readline() #this reads each and every line of file into a variable "line"
                 if not line: break
-                print line
                 outfile.write(line)
             infile.close()
 
