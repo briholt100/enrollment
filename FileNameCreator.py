@@ -27,7 +27,6 @@ def identify_files():#=locationInput()[0]):
     #regarding if statement, maybe include campusList?
     in_path = raw_input("enter full path for location of folder with files needing renaming:----> ")    
     file_list = os.listdir(in_path)
-    os.mkdir(os.path.join(in_path,"processed"),)
     for f in file_list:
         if ".xls" in f:
             needs_work.append(f)
@@ -39,7 +38,8 @@ def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates 
     #through each line creating a new file, saved in the original 
     #folder of xls files.  a bonus would be to then remove those .xls files. 
-    fileInfo=identify_files()
+    fileInfo=identify_files()    
+    os.mkdir(os.path.join(fileInfo[1],"processed"),)    
     for file in fileInfo[0]:
         book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
         sheet = book.sheet_names()[0]
