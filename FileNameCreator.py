@@ -107,7 +107,7 @@ def xls_to_csv():
                                     #each wanted line and saves to outfile
             print i
             infile.close()
-    print "You may now want to consider using cleanUp() to remove CSV files from this directory. Tidy() would be next."
+    print "You may now want to consider using cleanUp() to remove CSV files from this directory. tidy() could also be used to make 1 largefile."
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
@@ -126,7 +126,10 @@ def tidy():
 
 def cleanUp():
     in_path = raw_input("enter full path for location to clean:----> ")
-    file_list = os.listdir(in_path)    
+    file_list = os.listdir(in_path)
+    i=0    
     for f in file_list:
         if ".csv" in f:
+            i+=1            
             os.remove(os.path.join(in_path,f))
+    print "The number of files removed is "+ str(i)
