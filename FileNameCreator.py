@@ -41,7 +41,7 @@ def xls_to_csv():
     fileInfo=identify_files()    
     os.mkdir(os.path.join(fileInfo[1],"processed"),)    
     for file in fileInfo[0]:
-        book = xlrd.open_workbook(fileInfo[1] + "\\" + file)        
+        book = xlrd.open_workbook(os.path.join(fileInfo[1],file))        
         sheet = book.sheet_names()[0]
         worksheet = book.sheet_by_name(sheet) 
         campusInfo = str(worksheet.row(1)[0])
