@@ -1,4 +1,5 @@
 rm(list=ls())
+install.packages("psych")
 library(psych)
 library(venneuler)
 library(lattice)
@@ -12,7 +13,8 @@ library(ggplot2)
 
 #on home
 SccdEnrollments<-read.csv("C:\\Documents and Settings\\brian\\My Documents\\My Data Sources\\SCCD enrollment reports\\SccdEnrollments.csv",header=T, sep=",")
-
+SD<-read.csv("C:\\Users\\Brian\\Documents\\Data_Repo\\Data\\tidyEnrollments.csv",header=T, sep=",")
+SccdEnrollments<-SD
 #On AFT
 #SccdEnrollments<-read.csv("C:\\Users\\Brian\\Desktop\\R-Data\\SCCDEnrollments\\SccdEnrollments.csv",header=T, sep=",")
 
@@ -22,6 +24,7 @@ ls()
 
 attach(SccdEnrollments)
 describe(SccdEnrollments)
+str(SccdEnrollments)
 #describeBy(list(c(Enrolled,classCap)),list(c(Campus,Type)))
 SccdEnrollments<-SccdEnrollments[,-18]
 levels(TYPE.days)
