@@ -129,7 +129,8 @@ def cleanUp():
     file_list = os.listdir(in_path)
     i=0    
     for f in file_list:
-        if ".csv" in f:
-            i+=1            
-            os.remove(os.path.join(in_path,f))
+        if "tidy" not in f:
+                if ".csv" in f:
+                    i+=1            
+                    os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
