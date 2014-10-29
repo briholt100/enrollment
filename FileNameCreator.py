@@ -95,7 +95,7 @@ def xls_to_csv():
             while True:
                 i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
-                line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
+                #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
                 m = re.match("\"[0-9]{1,4}",line) #the wanted data in these 
                                         #file begins with a 4 digit item code. 
