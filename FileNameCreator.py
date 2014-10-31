@@ -96,18 +96,17 @@ def xls_to_csv():
             while True:
                 i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
-                columns = line.split(",")
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
-                end=re.search(",End,",line)
-                m = re.match("\"[0-9]{1,4}",line)                    
-                if end is None:
-                    if m is not None:
-                        columns.insert(6, "")
-                        outfile.write(prefix +",".join(columns))
-                else:
-                    if m is not None:
+                m = re.match("\"[0-9]{1,4}",line) 
+                end =re.search("Start\",\"End",line)
+                if m is not None:
+                    if end is not None:
                         outfile.write(prefix + line) # This writes the new string""" 
+                    else:
+                        columns = line.split(",")
+                        columns.insert(6, "")
+                        outfile.write(prefix+",".join(columns))
             print i
             infile.close()
     print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
