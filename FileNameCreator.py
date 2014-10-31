@@ -100,13 +100,15 @@ def xls_to_csv():
                 if not line: break
                 m = re.match("\"[0-9]{1,4}",line) 
                 end =re.search("Start\",\"End",line)
+#####  Here is the problem: the first line read never includes 'end', so the following code
+#####  will always trigger the "none" condition below
                 if m is not None:
-                    if end is not None:
-                        outfile.write(prefix + line) # This writes the new string""" 
-                    else:
+                    if end is None:
                         columns = line.split(",")
                         columns.insert(6, "")
-                        outfile.write(prefix+",".join(columns))
+                        outfile.write(prefix+",".join(columns))                        
+                    else:
+                        outfile.write(prefix + line) # This writes the new string""" 
             print i
             infile.close()
     print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
