@@ -1,8 +1,11 @@
 rm(list=ls())
 install.packages("psych")
 library(psych)
+install.packages("venneuler")
 library(venneuler)
+install.packages("lattice")
 library(lattice)
+install.packages("ggplot2")
 library(ggplot2)
 
 #load("~/My Data Sources/SCCD enrollment reports/SccdEnrollmentsNonCancelled.RData")
@@ -13,8 +16,17 @@ library(ggplot2)
 
 #on home
 SccdEnrollments<-read.csv("C:\\Documents and Settings\\brian\\My Documents\\My Data Sources\\SCCD enrollment reports\\SccdEnrollments.csv",header=T, sep=",")
-SD<-read.csv("C:\\Users\\Brian\\Documents\\Data_Repo\\Data\\tidyEnrollments.csv",header=T, sep=",")
-SccdEnrollments<-SD
+
+#on linux
+SccdEnrollments<-read.csv("/home/brian/Projects/Data/Renamed/processed/tidyEnrollments.csv",header=F, sep=",")
+#to get header names, open :
+header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",")
+header<-colnames(header)
+header[8]<-"start"
+header[10:17]<-header[9:16]
+header[9]<-"end"
+colnames(SccdEnrollments)<-header[-18]
+head(SccdEnrollments)
 #On AFT
 #SccdEnrollments<-read.csv("C:\\Users\\Brian\\Desktop\\R-Data\\SCCDEnrollments\\SccdEnrollments.csv",header=T, sep=",")
 
