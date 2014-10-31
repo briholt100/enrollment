@@ -102,19 +102,17 @@ def xls_to_csv():
                 m = re.match("\"[0-9]{1,4}",line) #the wanted data in these 
                                         #file begins with a 4 digit item code. 
                                         #No other lines have this bx.
+                end=re.search(",End,",line)
+                print end                
                 if m is not None:
-                    end=re.search("End",line)
-                    if end is not None:
-                        outfile.write(prefix + line) # This writes the new string 
-                    else: 
+                    if end is None:
                         columns.insert(6, "")
-                        #outfile.write(prefix + line)
                         outfile.write(prefix +",".join(columns))
-                                    #info to the beginning of 
-                                    #each wanted line and saves to outfile
+                    else: 
+                        outfile.write(prefix + line) # This writes the new string 
             print i
             infile.close()
-    print "You may now want to consider using cleanUp() to remove CSV files from this directory. tidy() could also be used to make 1 largefile."
+    print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could also be used to make 1 largefile."
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
