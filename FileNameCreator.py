@@ -102,8 +102,12 @@ def xls_to_csv():
                                         #file begins with a 4 digit item code. 
                                         #No other lines have this bx.
                 if m is not None:
-
-                    outfile.write(prefix + line) # This writes the new string 
+                    end=re.search("End",line)
+                    if end is not None:
+                        outfile.write(prefix + line) # This writes the new string 
+                    else: 
+                        commas=re.findall(",",line)
+                        outfile.write(prefix + line)
                                     #info to the beginning of 
                                     #each wanted line and saves to outfile
             print i
