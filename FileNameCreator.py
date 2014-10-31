@@ -91,7 +91,7 @@ def xls_to_csv():
         newCSV.close()
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
-        with io.open(currentFile, encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+        with io.open(currentFile, encoding='utf-8', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
             i=0            
             while True:
                 i+=1                
