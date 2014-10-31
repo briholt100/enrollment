@@ -99,20 +99,18 @@ def xls_to_csv():
                 columns = line.split(",")
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
-                m = re.match("\"[0-9]{1,4}",line) #the wanted data in these 
-                                        #file begins with a 4 digit item code. 
-                                        #No other lines have this bx.
                 end=re.search(",End,",line)
-                print end                
-                if m is not None:
-                    if end is None:
+                m = re.match("\"[0-9]{1,4}",line)                    
+                if end is None:
+                    if m is not None:
                         columns.insert(6, "")
                         outfile.write(prefix +",".join(columns))
-                    else: 
-                        outfile.write(prefix + line) # This writes the new string 
+                else:
+                    if m is not None:
+                        outfile.write(prefix + line) # This writes the new string""" 
             print i
             infile.close()
-    print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could also be used to make 1 largefile."
+    print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
