@@ -91,11 +91,12 @@ def xls_to_csv():
         newCSV.close()
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
-        with io.open(currentFile, encoding='utf-8', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+        with io.open(currentFile, encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
             i=0            
             while True:
                 i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
+                columns = line.split(",")
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
                 m = re.match("\"[0-9]{1,4}",line) #the wanted data in these 
@@ -106,9 +107,9 @@ def xls_to_csv():
                     if end is not None:
                         outfile.write(prefix + line) # This writes the new string 
                     else: 
-                        #should the dictionary go here, or should it go up at line 98 at readline?
-                        commas=re.findall(",",line)
-                        outfile.write(prefix + line)
+                        columns.insert(6, "")
+                        #outfile.write(prefix + line)
+                        outfile.write(prefix +",".join(columns))
                                     #info to the beginning of 
                                     #each wanted line and saves to outfile
             print i
