@@ -106,6 +106,7 @@ def xls_to_csv():
                     if end is not None:
                         outfile.write(prefix + line) # This writes the new string 
                     else: 
+                        #should the dictionary go here, or should it go up at line 98 at readline?
                         commas=re.findall(",",line)
                         outfile.write(prefix + line)
                                     #info to the beginning of 
