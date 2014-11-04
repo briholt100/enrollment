@@ -138,13 +138,14 @@ def addCol():
     i=0  
    # end =re.search("Start\",\"End",line)    
     for f in file_list:
-        with open(os.path.join(in_path,f),'w+') as infile: 
+        with open(os.path.join(in_path,f),"r+") as infile: 
             while True:
                 i+=1            
                 line=infile.readline()
                 if not line: break            
                 columns = line.split(",")
-              
+                print line
+                print len(columns)
                 if len(columns) is 17:
                     columns.insert(6, "")
                     #so here I have to not append, to overwrite the line
