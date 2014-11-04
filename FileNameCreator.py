@@ -135,6 +135,7 @@ def addCol():
                 if not line: break            
                 columns = line.split(",")
                 columns.insert(6, "")
+                infile.seek(0)                
                 infile.write(",".join(columns))
                 print len(columns)
                 #infile.write(line) # This writes the new string""" 
