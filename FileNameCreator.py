@@ -99,16 +99,8 @@ def xls_to_csv():
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
                 m = re.match("\"[0-9]{1,4}",line) 
-                end =re.search("Start\",\"End",line)
-#####  Here is the problem: the first line read never includes 'end', so the following code
-#####  will always trigger the "none" condition below
                 if m is not None:
-                    if end is None:
-                        columns = line.split(",")
-                        columns.insert(6, "")
-                        outfile.write(prefix+",".join(columns))                        
-                    else:
-                        outfile.write(prefix + line) # This writes the new string""" 
+                   outfile.write(prefix + line) # This writes the new string""" 
             print i
             infile.close()
     print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
@@ -138,3 +130,33 @@ def cleanUp():
                     i+=1            
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
+    
+#C:\Users\Brian\Documents\Data_Repo\testData    
+def addCol():
+    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
+    file_list = os.listdir(in_path)
+    i=0  
+   # end =re.search("Start\",\"End",line)    
+    for f in file_list:
+        with open(os.path.join(in_path,f),) as infile: 
+            while True:
+                i+=1            
+                line=infile.readline()
+                if not line: break            
+                columns = line.split(",")                
+                if columns is 17:
+                    columns.insert(6, "")
+                    #so here I have to not append, to overwrite the line
+                    outfile.write(prefix+",".join(columns))                        
+                else:
+                    outfile.write(prefix + line) # This writes the new string""" 
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
