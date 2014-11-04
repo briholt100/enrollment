@@ -119,7 +119,38 @@ def tidy():
                 if not line: break
                 outfile.write(line)
             infile.close()
-
+    
+#C:\Users\Brian\Documents\Data_Repo\testData    
+def addCol():
+    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
+    file_list = os.listdir(in_path)
+    i=0  
+   # end =re.search("Start\",\"End",line)    
+    for f in file_list:
+        with io.open(os.path.join(in_path,f),"r+",encoding='utf-8', errors='replace') as infile:
+            print f
+            while True:
+                i+=1            
+                line=infile.readline()
+                if not line: break            
+                columns = line.split(",")
+                columns.insert(6, "")
+                infile.write(",".join(columns))
+                print len(columns)
+                #infile.write(line) # This writes the new string""" 
+                    
+                """if len(columns) <= 17:
+                    
+                    #so here I have to not append, to overwrite the line
+                                            
+                else:"""
+                    
+                    
+                    
+                    
+                    
+                    
+                    
 def cleanUp():
     in_path = raw_input("enter full path for location to clean:----> ")
     file_list = os.listdir(in_path)
@@ -130,35 +161,3 @@ def cleanUp():
                     i+=1            
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
-    
-#C:\Users\Brian\Documents\Data_Repo\testData    
-def addCol():
-    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
-    file_list = os.listdir(in_path)
-    i=0  
-   # end =re.search("Start\",\"End",line)    
-    for f in file_list:
-        with open(os.path.join(in_path,f),"r+") as infile: 
-            while True:
-                i+=1            
-                line=infile.readline()
-                if not line: break            
-                columns = line.split(",")
-                print line
-                print len(columns)
-                if len(columns) is 17:
-                    columns.insert(6, "")
-                    #so here I have to not append, to overwrite the line
-                    infile.write(",".join(columns))                        
-                else:
-                    infile.write(line) # This writes the new string""" 
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
