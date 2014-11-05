@@ -38,7 +38,9 @@ def identify_files():#=locationInput()[0]):
 def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates 
     #through each line creating a new file, saved in the original 
-    #folder of xls files.  a bonus would be to then remove those .xls files. 
+    #folder of xls files.  a bonus would be to then remove those .xls files.
+    print "There are some important content characteristics.\n\n1. the file must have the following information at \nthe top of the file: 'south - FALL 13 :' This is because\nthis program uses this info to make a file name.\n\n"
+
     fileInfo=identify_files()    
     os.mkdir(os.path.join(fileInfo[1],"processed"),)    
     for file in fileInfo[0]:
@@ -120,37 +122,7 @@ def tidy():
                 outfile.write(line)
             infile.close()
     
-#C:\Users\Brian\Documents\Data_Repo\testData    
-def addCol():
-    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
-    file_list = os.listdir(in_path)
-    i=0  
-   # end =re.search("Start\",\"End",line)    
-    for f in file_list:
-        with io.open(os.path.join(in_path,f),"r+",encoding='utf-8', errors='replace') as infile:
-            print f
-            while True:
-                i+=1            
-                line=infile.readline()
-                if not line: break            
-                columns = line.split(",")
-                columns.insert(6, "")
-                infile.seek(0)                
-                infile.write(",".join(columns))
-                print len(columns)
-                #infile.write(line) # This writes the new string""" 
-                    
-                """if len(columns) <= 17:
-                    
-                    #so here I have to not append, to overwrite the line
-                                            
-                else:"""
-                    
-                    
-                    
-                    
-                    
-                    
+                   
                     
 def cleanUp():
     in_path = raw_input("enter full path for location to clean:----> ")
@@ -162,3 +134,31 @@ def cleanUp():
                     i+=1            
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
+
+
+def addCol():
+    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
+    file_list = os.listdir(in_path)
+    i=0
+    print "\n\nThese are the files to be analyzed \n for a need of an extra column: \n\n " + str(file_list)
+   # end =re.search("Start\",\"End",line)    
+    for f in file_list:
+        print "###\n####\n"        
+        print f
+        print "####\n###\n\n"
+        outfile_store= os.path.join(in_path,"COLUMN"+f)            
+        with io.open(os.path.join(in_path,f),"r+",encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile:
+            while True:
+                i+=1            
+                line=infile.readline()
+                if not line: break            
+########
+##### The next line is the problem because in "instructor" field, there are sometimes commas.'                
+                columns = line.split(",")
+                print len(columns)
+                print line
+                #if len(columns) <= 16:
+                columns.insert(8, "")
+                outfile.write(",".join(columns))                
+                #else:
+                 #   outfile.write(line)
