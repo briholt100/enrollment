@@ -38,7 +38,9 @@ def identify_files():#=locationInput()[0]):
 def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates 
     #through each line creating a new file, saved in the original 
-    #folder of xls files.  a bonus would be to then remove those .xls files. 
+    #folder of xls files.  a bonus would be to then remove those .xls files.
+    print "There are some important content characteristics.\n\n1. the file must have the following information at \nthe top of the file: 'south - FALL 13 :' This is because\nthis program uses this info to make a file name.\n\n"
+
     fileInfo=identify_files()    
     os.mkdir(os.path.join(fileInfo[1],"processed"),)    
     for file in fileInfo[0]:
@@ -92,35 +94,30 @@ def xls_to_csv():
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
 <<<<<<< HEAD
+<<<<<<< HEAD
         with io.open(currentFile,encoding='windows-1252', errors='replace') as infile, io.open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
 =======
         with io.open(currentFile, encoding='utf-8', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
 >>>>>>> 155b9093ddb5e037447f41a8e991bd555867c8da
+=======
+        with io.open(currentFile, encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile: 
+>>>>>>> 5f6c7500456f96e1f2bd8cd7942f74652443fc49
             i=0            
             while True:
                 i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
-                m = re.match("\"[0-9]{1,4}",line) #the wanted data in these 
-                                        #file begins with a 4 digit item code. 
-                                        #No other lines have this bx.
+                m = re.match("\"[0-9]{1,4}",line) #all data is preceded by a number; no other rows have a number at the beginning
                 if m is not None:
-                    end=re.search("End",line)
-                    if end is not None:
-                        outfile.write(prefix + line) # This writes the new string 
-                    else: 
-                        commas=re.findall(",",line)
-                        outfile.write(prefix + line)
-                                    #info to the beginning of 
-                                    #each wanted line and saves to outfile
+                   outfile.write(prefix + line) # This writes the new string""" 
             print i
             infile.close()
-    print "You may now want to consider using cleanUp() to remove CSV files from this directory. tidy() could also be used to make 1 largefile."
+    print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
-def tidy():
+def tidy():# should create a condtion to ignore non "Column" files
     tidy_path = raw_input("enter full path for location of folder with files to tidy:----> ")
     file_list = os.listdir(tidy_path)
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
@@ -132,7 +129,9 @@ def tidy():
                 if not line: break
                 outfile.write(line)
             infile.close()
-
+    
+                   
+                    
 def cleanUp():
     in_path = raw_input("enter full path for location to clean:----> ")
     file_list = os.listdir(in_path)
@@ -143,3 +142,24 @@ def cleanUp():
                     i+=1            
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
+
+def addCol():
+    in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
+    file_list = os.listdir(in_path)
+    i=0
+    print "\n\nThese are the files to be analyzed \n for a need of an extra column: \n\n " + str(file_list)
+   # end =re.search("Start\",\"End",line)    
+    for f in file_list:
+        outfile_store= os.path.join(in_path,"COLUMN"+f)            
+        with io.open(os.path.join(in_path,f),"r+",encoding='windows-1252', \
+                errors='replace') as infile, open(outfile_store, "a") as outfile:
+            while True:
+                i+=1            
+                line=infile.readline()
+                if not line: break            
+                columns = line.split('\",\"')
+                if len(columns) <= 15:
+                    columns.insert(6, " ")
+                    outfile.write('\",\"'.join(columns))                
+                else:
+                    outfile.write(line)
