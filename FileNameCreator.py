@@ -152,13 +152,13 @@ def addCol():
                 i+=1            
                 line=infile.readline()
                 if not line: break            
-########
-##### The next line is the problem because in "instructor" field, there are sometimes commas.'                
-                columns = line.split(",")
-                print len(columns)
-                print line
-                #if len(columns) <= 16:
-                columns.insert(8, "")
-                outfile.write(",".join(columns))                
-                #else:
-                 #   outfile.write(line)
+                columns = line.split('\",\"')
+                print line                
+                print columns
+                #print len(columns)
+                if len(columns) <= 14:
+                    columns.insert(6, ',')
+                    print columns
+                    outfile.write('\",\"'.join(columns))                
+                else:
+                    outfile.write(line)
