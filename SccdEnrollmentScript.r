@@ -1,8 +1,11 @@
 rm(list=ls())
 install.packages("psych")
 library(psych)
+install.packages("venneuler")
 library(venneuler)
+install.packages("lattice")
 library(lattice)
+install.packages("ggplot2")
 library(ggplot2)
 
 #load("~/My Data Sources/SCCD enrollment reports/SccdEnrollmentsNonCancelled.RData")
@@ -13,8 +16,18 @@ library(ggplot2)
 
 #on home
 SccdEnrollments<-read.csv("C:\\Documents and Settings\\brian\\My Documents\\My Data Sources\\SCCD enrollment reports\\SccdEnrollments.csv",header=T, sep=",")
-SD<-read.csv("C:\\Users\\Brian\\Documents\\Data_Repo\\Data\\tidyEnrollments.csv",header=T, sep=",")
-SccdEnrollments<-SD
+
+#on linux
+SccdEnrollments<-read.csv("/home/brian/Projects/Data/Renamed/processed/tidyEnrollments.csv",header=F, sep=",")
+#to get header names, open :
+header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",")
+header<-colnames(header)
+header[8]<-"start"
+header[10:17]<-header[9:16]
+header[9]<-"end"
+header
+colnames(SccdEnrollments)<-header[-18]
+head(SccdEnrollments)
 #On AFT
 #SccdEnrollments<-read.csv("C:\\Users\\Brian\\Desktop\\R-Data\\SCCDEnrollments\\SccdEnrollments.csv",header=T, sep=",")
 
@@ -26,7 +39,7 @@ attach(SccdEnrollments)
 describe(SccdEnrollments)
 str(SccdEnrollments)
 #describeBy(list(c(Enrolled,classCap)),list(c(Campus,Type)))
-SccdEnrollments<-SccdEnrollments[,-18]
+#SccdEnrollments<-SccdEnrollments[,-18]
 levels(TYPE.days)
 Type<-"Typical"
 levels(Type)
@@ -69,9 +82,9 @@ SccdEnrollments[SccdEnrollments$Enrolled != 0 & SccdEnrollments$cancel=="cancell
 SccdEnrollments$cancel[SccdEnrollments$Enrolled != 0 & SccdEnrollments$cancel=="canclled"]="live"
 
 names(SccdEnrollments)
-head(SccdEnrollments[c(-12,-21)])
+head(SccdEnrollments[c(-13)])
 
-SccdEnrollments<-SccdEnrollments[c(-12,-21)]
+SccdEnrollments<-SccdEnrollments[c(-13)]
 split.by.cancel<-split(SccdEnrollments,SccdEnrollments$cancel)
 split.by.campus.and.type<-split(SccdEnrollments,list(SccdEnrollments$Campus,SccdEnrollments$Type))
 split.by.campus.type.cancel<-split(SccdEnrollments,list(SccdEnrollments$Campus,SccdEnrollments$Type,SccdEnrollments$cancel))
@@ -93,7 +106,7 @@ SccdEnrollments$Instructor<-factor(SccdEnrollments$Instructor)
 
 unique.instructors<-match(unique(SccdEnrollments$Instructor),SccdEnrollments$Instructor)
 
-SccdEnrollments[unique.instructors,c(5,10)] #this looks promising for narrowing down the instructors.  eg, ending with a "."
+head(SccdEnrollments[unique.instructors,c(5,10)]) #this looks promising for narrowing down the instructors.  eg, ending with a "."
 
 ##the following will put a space after the "&"
 SccdEnrollments$Course.ID<-sub("\\&", "\\& ",SccdEnrollments$Course.ID)

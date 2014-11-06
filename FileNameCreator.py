@@ -91,7 +91,11 @@ def xls_to_csv():
         newCSV.close()
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
+<<<<<<< HEAD
         with io.open(currentFile,encoding='windows-1252', errors='replace') as infile, io.open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+=======
+        with io.open(currentFile, encoding='utf-8', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+>>>>>>> 155b9093ddb5e037447f41a8e991bd555867c8da
             i=0            
             while True:
                 i+=1                
@@ -102,8 +106,12 @@ def xls_to_csv():
                                         #file begins with a 4 digit item code. 
                                         #No other lines have this bx.
                 if m is not None:
-
-                    outfile.write(prefix + line) # This writes the new string 
+                    end=re.search("End",line)
+                    if end is not None:
+                        outfile.write(prefix + line) # This writes the new string 
+                    else: 
+                        commas=re.findall(",",line)
+                        outfile.write(prefix + line)
                                     #info to the beginning of 
                                     #each wanted line and saves to outfile
             print i
