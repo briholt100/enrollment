@@ -157,7 +157,7 @@ def addCol():
                 print columns
                 #print len(columns)
                 if len(columns) <= 14:
-                    columns.insert(6, ',')
+                    columns.insert(6, " ")
                     print columns
                     outfile.write('\",\"'.join(columns))                
                 else:
