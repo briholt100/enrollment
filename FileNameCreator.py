@@ -93,14 +93,14 @@ def xls_to_csv():
         newCSV.close()
         currentFile =os.path.join(fileInfo[1],campus+quarter+"20"+yr2+"Enrollments.csv")
         outfile_store= os.path.join(fileInfo[1],"processed","final" + campus+quarter+"20"+yr2+"Enrollments.csv")
-        with io.open(currentFile, encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile: # infile and outfile are temp/local variables
+        with io.open(currentFile, encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile: 
             i=0            
             while True:
                 i+=1                
                 line=infile.readline() #this reads each and every line of file into a variable "line"
                 #line=line.replace('\xa0', '').encode('utf-8') #this replaces the unicode character
                 if not line: break
-                m = re.match("\"[0-9]{1,4}",line) 
+                m = re.match("\"[0-9]{1,4}",line) #all data is preceded by a number; no other rows have a number at the beginning
                 if m is not None:
                    outfile.write(prefix + line) # This writes the new string""" 
             print i
@@ -109,7 +109,7 @@ def xls_to_csv():
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
-def tidy():
+def tidy():# should create a condtion to ignore non "Column" files
     tidy_path = raw_input("enter full path for location of folder with files to tidy:----> ")
     file_list = os.listdir(tidy_path)
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
@@ -135,7 +135,6 @@ def cleanUp():
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
 
-
 def addCol():
     in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
     file_list = os.listdir(in_path)
@@ -143,22 +142,16 @@ def addCol():
     print "\n\nThese are the files to be analyzed \n for a need of an extra column: \n\n " + str(file_list)
    # end =re.search("Start\",\"End",line)    
     for f in file_list:
-        print "###\n####\n"        
-        print f
-        print "####\n###\n\n"
         outfile_store= os.path.join(in_path,"COLUMN"+f)            
-        with io.open(os.path.join(in_path,f),"r+",encoding='windows-1252', errors='replace') as infile, open(outfile_store, "a") as outfile:
+        with io.open(os.path.join(in_path,f),"r+",encoding='windows-1252', \
+                errors='replace') as infile, open(outfile_store, "a") as outfile:
             while True:
                 i+=1            
                 line=infile.readline()
                 if not line: break            
                 columns = line.split('\",\"')
-                print line                
-                print columns
-                #print len(columns)
-                if len(columns) <= 14:
+                if len(columns) <= 15:
                     columns.insert(6, " ")
-                    print columns
                     outfile.write('\",\"'.join(columns))                
                 else:
                     outfile.write(line)
