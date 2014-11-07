@@ -136,6 +136,7 @@ def cleanUp():
     print "The number of files removed is "+ str(i)
 
 def addCol():
+    print "\nBe sure that the columns you are processing \nare of the correct number (15 is the min)"
     in_path = raw_input("enter full path for location of files\n needing an extra column:----> ")
     file_list = os.listdir(in_path)
     i=0
