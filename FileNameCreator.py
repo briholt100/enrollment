@@ -115,12 +115,13 @@ def tidy():# should create a condtion to ignore non "Column" files
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
     for file in file_list:
         #up to this point it works because file, below, needs.  
-        with open(os.path.join(tidy_path,file),) as infile, open(outfile_store, "a") as outfile: 
-            while True:
-                line=infile.readline() #this reads each and every line of file into a variable "line"
-                if not line: break
-                outfile.write(line)
-            infile.close()
+        if "COLUMN" in file:
+            with open(os.path.join(tidy_path,file),) as infile, open(outfile_store, "a") as outfile: 
+                while True:
+                    line=infile.readline() #this reads each and every line of file into a variable "line"
+                    if not line: break
+                    outfile.write(line)
+                infile.close()
     
                    
                     
