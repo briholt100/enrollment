@@ -109,16 +109,15 @@ def xls_to_csv():
 
 """Create one file called "tidy" that has all rows from all files in a folder."""
 
-def tidy():# should create a condtion to ignore non "Column" files
+def tidy():
     tidy_path = raw_input("enter full path for location of folder with files to tidy:----> ")
     file_list = os.listdir(tidy_path)
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
     for file in file_list:
-        #up to this point it works because file, below, needs.  
         if "COLUMN" in file:
             with open(os.path.join(tidy_path,file),) as infile, open(outfile_store, "a") as outfile: 
                 while True:
-                    line=infile.readline() #this reads each and every line of file into a variable "line"
+                    line=infile.readline() 
                     if not line: break
                     outfile.write(line)
                 infile.close()
@@ -141,7 +140,6 @@ def addCol():
     file_list = os.listdir(in_path)
     i=0
     print "\n\nThese are the files to be analyzed \n for a need of an extra column: \n\n " + str(file_list)
-   # end =re.search("Start\",\"End",line)    
     for f in file_list:
         outfile_store= os.path.join(in_path,"COLUMN"+f)            
         with io.open(os.path.join(in_path,f),"r+",encoding='windows-1252', \
