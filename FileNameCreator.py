@@ -38,7 +38,7 @@ def identify_files():#=locationInput()[0]):
 def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates 
     #through each line creating a new file, saved in the original 
-    #folder of xls files.  a bonus would be to then remove those .xls files.
+    #folder of xls files.
     print "There are some important content characteristics.\n\n1. the file must have the following information at \nthe top of the file: 'south - FALL 13 :' This is because\nthis program uses this info to make a file name.\n\n"
 
     fileInfo=identify_files()    
@@ -107,9 +107,9 @@ def xls_to_csv():
             infile.close()
     print "You may now want to consider using cleanUp() to remove \n CSV files from this directory. The function tidy() could\n also be used to make 1 largefile."
 
-"""Create one file called "tidy" that has all rows from all files in a folder."""
 
-def tidy():
+
+def tidy():  #Creates from many CSV one file called "tidy"
     tidy_path = raw_input("enter full path for location of folder with files to tidy:----> ")
     file_list = os.listdir(tidy_path)
     outfile_store= os.path.join(tidy_path,"tidyEnrollments.csv")
@@ -124,7 +124,7 @@ def tidy():
     
                    
                     
-def cleanUp():
+def cleanUp(): #searches for non tidy csv files and deletes them. BE CAREFUL
     in_path = raw_input("enter full path for location to clean:----> ")
     file_list = os.listdir(in_path)
     i=0    
@@ -134,6 +134,13 @@ def cleanUp():
                     i+=1            
                     os.remove(os.path.join(in_path,f))
     print "The number of files removed is "+ str(i)
+
+
+###
+###  The following addCol searches the number of columns to add an extra 
+###    one after "start time"
+###  Some of the older files don't have "end time", while newer ones do
+
 
 def addCol():
     print "\nBe sure that the columns you are processing \nare of the correct number (15 is the min)"
