@@ -39,7 +39,7 @@ def xls_to_csv():
     #this opens xls file, identifies first worksheet, and iterates 
     #through each line creating a new file, saved in the original 
     #folder of xls files.
-    print "There are some important content characteristics.\n\n1. the file must have the following information at \nthe top of the file: 'south - FALL 13 :' This is because\nthis program uses this info to make a file name.\n\n"
+    print "There are some important content characteristics.\n\n1. the file must have the following information at \nthe first record of the file: 'south - FALL 13 :' This is because\nthis program uses this info to make a file name.\n\n"
 
     fileInfo=identify_files()    
     os.mkdir(os.path.join(fileInfo[1],"processed"),)    
