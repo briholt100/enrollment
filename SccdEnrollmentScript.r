@@ -1,11 +1,11 @@
 rm(list=ls())
+install.packages("ggplot2")
+install.packages("lattice")
+install.packages("venneuler")
 install.packages("psych")
 library(psych)
-install.packages("venneuler")
 library(venneuler)
-install.packages("lattice")
 library(lattice)
-install.packages("ggplot2")
 library(ggplot2)
 
 #load("~/My Data Sources/SCCD enrollment reports/SccdEnrollmentsNonCancelled.RData")
@@ -19,20 +19,24 @@ SccdEnrollments<-read.csv("C:\\Documents and Settings\\brian\\My Documents\\My D
 
 #on linux
 SccdEnrollments<-read.csv("/home/brian/Projects/Data/Renamed/processed/tidyEnrollments.csv",header=F, sep=",")
-#to get header names, open :
-header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",")
+
+#to get header names, open : Linux
+header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",") 
+#to get header names, open : on campus
+header<-read.csv("I:\\My Data Sources\\SCCDEnrollments\\SccdEnrollment.csv",header=T,sep=",") 
+
 header<-colnames(header)
 header[8]<-"start"
-header[10:17]<-header[9:16]
+header[10:18]<-header[9:17]
 header[9]<-"end"
 header
-colnames(SccdEnrollments)<-header[-18]
+colnames(SccdEnrollments)<-header
 head(SccdEnrollments)
 #On AFT
 #SccdEnrollments<-read.csv("C:\\Users\\Brian\\Desktop\\R-Data\\SCCDEnrollments\\SccdEnrollments.csv",header=T, sep=",")
 
 #oncampus
-#SccdEnrollments<-read.csv("I:\\My Data Sources\\SCCDEnrollments/SccdEnrollments.csv",header=T, sep=",")
+#SccdEnrollments<-read.csv("I:\\My Data Sources\\Data\\Data\\tidyEnrollments.csv",header=T, sep=",")
 ls()
 
 attach(SccdEnrollments)
@@ -127,6 +131,10 @@ splitCourse<-strsplit(as.character(SccdEnrollments$Course.ID)," ")  #this splits
 ##Now make 3 new variables: Course (eg, psych), level (eg., 100), section
 
 
+##Create only Psych courses, District wide
+PsychEnroll<-SccdEnrollments[grep("psy", Course.ID, ignore.case=T),]
+nrow(PsychEnroll[PsychEnroll$Campus == "North",])
+NorthPsychEnroll<-PsychEnroll[PsychEnroll$Campus == "North",]  ###only north psych courses
 
 
 
@@ -150,7 +158,7 @@ SccdEnrollments$FTEstate.cut<-cut(SccdEnrollments$FTES.STATE,4)
 
 df<-SccdEnrollments[SccdEnrollments$cancel=="live",]
 nrow(df)
-plot(df[,c(11:13,17)],pch=19,sub=df$Type,col=df$Type,cex=df$waitlist.ratio+1*1.5)
+plot(df[,c(12:14,18)],pch=19,sub=df$Type,col=df$Type,cex=df$waitlist.ratio+1*1.5)
 title.table<-table(df$Title,df$Type)
 titles<-title.table[,2:4]
 titles<-data.frame(titles)
