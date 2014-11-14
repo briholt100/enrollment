@@ -14,14 +14,20 @@ library(ggplot2)
 #you want to look at data, check for reasonable ranges, scores
 #tapply(x,INDEX--c(variable1,2,3),range, mean, median)
 
-#on home
-SccdEnrollments<-read.csv("C:\\Documents and Settings\\brian\\My Documents\\My Data Sources\\SCCD enrollment reports\\SccdEnrollments.csv",header=T, sep=",")
+#old Sccd Enrollments
+
+#on window
+SccdEnrollments<-read.csv("C:\\Users\\Brian\\Documents\\Data_Repo\\Data\\tidyEnrollments.csv",header=T, sep=",")
 
 #on linux
 SccdEnrollments<-read.csv("/home/brian/Projects/Data/Renamed/processed/tidyEnrollments.csv",header=F, sep=",")
 
 #to get header names, open : Linux
-header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",") 
+header<-read.csv("/home/brian/Projects/enrollment/SccdEnrollments.csv",header=T,sep=",")
+#to get header names, open : home window
+header<-read.csv("C:\\Users\\Brian\\Documents\\Data_Repo\\Data\\SccdEnrollment.csv",header=T,sep=",")
+
+
 #to get header names, open : on campus
 header<-read.csv("I:\\My Data Sources\\SCCDEnrollments\\SccdEnrollment.csv",header=T,sep=",") 
 
@@ -136,8 +142,14 @@ PsychEnroll<-SccdEnrollments[grep("psy", Course.ID, ignore.case=T),]
 nrow(PsychEnroll[PsychEnroll$Campus == "North",])
 NorthPsychEnroll<-PsychEnroll[PsychEnroll$Campus == "North",]  ###only north psych courses
 
-
-
+describe(NorthPsychEnroll)
+test<-(subset(SccdEnrollments,Quarter == "Fall 2010"|
+              Quarter == "Winter 2011"|
+              Quarter == "Spring 2011"|
+              Quarter == "Fall 2011"|
+              Quarter == "Winter 2012"|
+              Quarter == "Spring 2012",select= c(Quarter,Campus,Enrolled)))
+mean(test$Enrolled)
 
 SccdEnrollments$credit.count<-equal.count(SccdEnrollments$CREDIT,4) #used in lattice
 SccdEnrollments$enrolled.count<-equal.count(SccdEnrollments$Enrolled,4) #used in lattice
