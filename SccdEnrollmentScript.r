@@ -36,14 +36,15 @@ header[8]<-"start"
 header[10:18]<-header[9:17]
 header[9]<-"end"
 header
-colnames(SccdEnrollments)<-header
-head(SccdEnrollments)
+
 #On AFT
 #SccdEnrollments<-read.csv("C:\\Users\\Brian\\Desktop\\R-Data\\SCCDEnrollments\\SccdEnrollments.csv",header=T, sep=",")
 
 #oncampus
 #SccdEnrollments<-read.csv("I:\\My Data Sources\\Data\\Data\\tidyEnrollments.csv",header=T, sep=",")
 ls()
+colnames(SccdEnrollments)<-header
+head(SccdEnrollments)
 
 attach(SccdEnrollments)
 describe(SccdEnrollments)
@@ -143,6 +144,9 @@ nrow(PsychEnroll[PsychEnroll$Campus == "North",])
 NorthPsychEnroll<-PsychEnroll[PsychEnroll$Campus == "North",]  ###only north psych courses
 
 describe(NorthPsychEnroll)
+
+
+###The following was used to see if this data is similar to another set of date for the included dates.
 test<-(subset(SccdEnrollments,Quarter == "Fall 2010"|
               Quarter == "Winter 2011"|
               Quarter == "Spring 2011"|
@@ -150,6 +154,26 @@ test<-(subset(SccdEnrollments,Quarter == "Fall 2010"|
               Quarter == "Winter 2012"|
               Quarter == "Spring 2012",select= c(Quarter,Campus,Enrolled)))
 mean(test$Enrolled)
+
+NorthPsychEnroll$Course<-"599"
+
+NorthPsychEnroll$Course[grep("100",NorthPsychEnroll$Course.ID)]<-"100"
+NorthPsychEnroll$Course[grep("200",NorthPsychEnroll$Course.ID)]<-"200"
+NorthPsychEnroll$Course[grep("205",NorthPsychEnroll$Course.ID)]<-"205"
+NorthPsychEnroll$Course[grep("209",NorthPsychEnroll$Course.ID)]<-"209"
+NorthPsychEnroll$Course[grep("210",NorthPsychEnroll$Course.ID)]<-"210"
+NorthPsychEnroll$Course[grep("220",NorthPsychEnroll$Course.ID)]<-"220"
+NorthPsychEnroll$Course[grep("222",NorthPsychEnroll$Course.ID)]<-"222"
+NorthPsychEnroll$Course[grep("230",NorthPsychEnroll$Course.ID)]<-"230"
+NorthPsychEnroll$Course[grep("245",NorthPsychEnroll$Course.ID)]<-"245"
+NorthPsychEnroll$Course[grep("257",NorthPsychEnroll$Course.ID)]<-"257"
+NorthPsychEnroll$Course[grep("298",NorthPsychEnroll$Course.ID)]<-"298"
+NorthPsychEnroll$Course[grep("299",NorthPsychEnroll$Course.ID)]<-"299"
+
+table(NorthPsychEnroll$Course)
+tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Course,mean)
+
+boxplot(NorthPsychEnroll$Enrolled~NorthPsychEnroll$Course)
 
 SccdEnrollments$credit.count<-equal.count(SccdEnrollments$CREDIT,4) #used in lattice
 SccdEnrollments$enrolled.count<-equal.count(SccdEnrollments$Enrolled,4) #used in lattice
