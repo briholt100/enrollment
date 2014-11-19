@@ -4,7 +4,7 @@ install.packages("lattice")
 install.packages("venneuler")
 install.packages("psych")
 library(psych)
-library(venneuler)
+#library(venneuler)
 library(lattice)
 library(ggplot2)
 
@@ -170,10 +170,15 @@ NorthPsychEnroll$Course[grep("257",NorthPsychEnroll$Course.ID)]<-"257"
 NorthPsychEnroll$Course[grep("298",NorthPsychEnroll$Course.ID)]<-"298"
 NorthPsychEnroll$Course[grep("299",NorthPsychEnroll$Course.ID)]<-"299"
 
+levels(NorthPsychEnroll$Instructor)<-levels(factor(NorthPsychEnroll$Instructor))
 table(NorthPsychEnroll$Course)
 tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Course,mean)
-
+quarterMean<-tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Quarter,mean)
 boxplot(NorthPsychEnroll$Enrolled~NorthPsychEnroll$Course)
+plot(quarterMean)
+qplot(Quarter,Enrolled,data=NorthPsychEnroll, color = Instructor)
+
+ggplot()
 
 SccdEnrollments$credit.count<-equal.count(SccdEnrollments$CREDIT,4) #used in lattice
 SccdEnrollments$enrolled.count<-equal.count(SccdEnrollments$Enrolled,4) #used in lattice
