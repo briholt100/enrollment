@@ -170,7 +170,7 @@ NorthPsychEnroll$Course[grep("257",NorthPsychEnroll$Course.ID)]<-"257"
 NorthPsychEnroll$Course[grep("298",NorthPsychEnroll$Course.ID)]<-"298"
 NorthPsychEnroll$Course[grep("299",NorthPsychEnroll$Course.ID)]<-"299"
 
-levels(NorthPsychEnroll$Instructor)<-levels(factor(NorthPsychEnroll$Instructor))
+NorthPsychEnroll$Instructor<-factor(NorthPsychEnroll$Instructor)
 table(NorthPsychEnroll$Course)
 tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Course,mean)
 quarterMean<-tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Quarter,mean)
