@@ -184,7 +184,9 @@ qplot(quarterMean)
 tapply(NorthPsychEnroll$Enrolled,c(NorthPsychEnroll$Course,NorthPsychEnroll$Quarter),mean)
 
 
-ggplot()
+ggplot(NorthPsychEnroll,aes(y=Enrolled,x=Quarter,group=Course,color=Course))+geom_line(aes(group=1))
+)
+
 
 SccdEnrollments$credit.count<-equal.count(SccdEnrollments$CREDIT,4) #used in lattice
 SccdEnrollments$enrolled.count<-equal.count(SccdEnrollments$Enrolled,4) #used in lattice
