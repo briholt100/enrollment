@@ -170,13 +170,19 @@ NorthPsychEnroll$Course[grep("257",NorthPsychEnroll$Course.ID)]<-"257"
 NorthPsychEnroll$Course[grep("298",NorthPsychEnroll$Course.ID)]<-"298"
 NorthPsychEnroll$Course[grep("299",NorthPsychEnroll$Course.ID)]<-"299"
 
+NorthPsychEnroll$Instructor[grep("canc",NorthPsychEnroll$Instructor,ignore.case=T,value=F)]<-"Cancelled"
+
+
 NorthPsychEnroll$Instructor<-factor(NorthPsychEnroll$Instructor)
 table(NorthPsychEnroll$Course)
-tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Course,mean)
+CourseMean<-tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Course,mean)
 quarterMean<-tapply(NorthPsychEnroll$Enrolled,NorthPsychEnroll$Quarter,mean)
 boxplot(NorthPsychEnroll$Enrolled~NorthPsychEnroll$Course)
 plot(quarterMean)
-qplot(Quarter,Enrolled,data=NorthPsychEnroll, color = Instructor)
+qplot(Quarter,Enrolled,data=NorthPsychEnroll, color = Course)
+qplot(quarterMean)
+tapply(NorthPsychEnroll$Enrolled,c(NorthPsychEnroll$Course,NorthPsychEnroll$Quarter),mean)
+
 
 ggplot()
 
