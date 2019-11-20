@@ -22,6 +22,7 @@ download.file(url.1, destfile = "scrapedpage.html", quiet=TRUE)
 content <- read_html("scrapedpage.html")
 content %>% html_nodes(xpath='/html/head/title')
 content %>%  html_table(.,fill=T) -> table.list
+content %>% html_nodes("a")
 
 
 #selenium
@@ -43,7 +44,7 @@ el$sendKeysToElement(list('login'))
 
 el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
 el.1$highlightElement()
-el.1$sendKeysToElement(list(''))
+el.1$sendKeysToElement(list('pass'))
 el$sendKeysToElement(list(key='enter'))
 
 col <- c('062','063','064')
