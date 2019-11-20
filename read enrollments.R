@@ -1,10 +1,6 @@
-library(RSelenium)
+library(RSelenium) 
 library(rvest)
-library(tidyr)
-library(dplyr)
 library(tidyverse)
-library(robotstxt)
-
 col <- c('062','063','064')
 q <- c('B903')
 qn <- c('Winter 20')
@@ -22,12 +18,13 @@ download.file(url.1, destfile = "scrapedpage.html", quiet=TRUE)
 content <- read_html("scrapedpage.html")
 content %>% html_nodes(xpath='/html/head/title')
 content %>%  html_table(.,fill=T) -> table.list
-content %>% html_nodes("a")
+content %>% html_nodes("tr")
 
 
 #selenium
 robotstxt:::get_robotstxt('https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment')
-driver <- rsDriver(browser=c("firefox"))
+driver <- rsDriver(browser =c("firefox"))
+##https://github.com/ropensci/RSelenium/issues/116
 remote_driver <- driver[["client"]]
 remote_driver$open()
 remote_driver$close()
@@ -50,7 +47,15 @@ el$sendKeysToElement(list(key='enter'))
 
 col <- c('062','063','064')
 q <- c('B903')
-qn <- c('Winter 20')
+qnum <- c(1:4)
+year.start.num <- 9
+year.end.num <- 10
+
+
+qy <- c('Winter 20')
+season <- c("Summer","Fall","Winter","Spring")
+last.2.digits <- c(20:10,"09","08","07","06","05")
+
 
 
 read_html(url.1)
