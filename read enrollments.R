@@ -1,4 +1,4 @@
-library(RSelenium) 
+library(RSelenium)
 library(rvest)
 library(tidyverse)
 col <- c('062','063','064')
@@ -8,7 +8,7 @@ qn <- c('Winter 20')
 url.1 <- "https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment"
 
 content <- read_html(url.1)
- content %>%  html_text(.,trim = F) %>% 
+ content %>%  html_text(.,trim = F) %>%
   jsonlite::fromJSON(.)
 
 
@@ -27,11 +27,11 @@ driver <- rsDriver(browser =c("firefox"))
 ##https://github.com/ropensci/RSelenium/issues/116
 remote_driver <- driver[["client"]]
 remote_driver$open()
-remote_driver$close()
+#remote_driver$close()
 remote_driver$navigate("https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment")
 RSelenium:::selKeys %>% names()
 remote_driver$refresh()
-el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]') 
+el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]')
 el$highlightElement()
 
 el$clickElement()
@@ -140,4 +140,3 @@ grep('clus',rows,ignore.case=T)
   <td style="text-align: center; border-left: solid 1px #FFFFFF;">
   <span id="rptClusterRpt_ctl417_Cluster">9650B903</span>
   </td>
-  
