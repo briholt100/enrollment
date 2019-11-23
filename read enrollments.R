@@ -54,7 +54,12 @@ year.end.num <- 10
 
 qy <- c('Winter 20')
 season <- c("Summer","Fall","Winter","Spring")
-last.2.digits <- c(20:10,"09","08","07","06","05")
+
+year.quarter<- paste0('B','.',rep(2019:2000,each=4),'.',4:1,'.',"y")
+year.quarter
+
+cbind(year.quarter)
+
 
 
 
