@@ -36,13 +36,13 @@ el$highlightElement()
 
 el$clickElement()
 
-el$sendKeysToElement(list('id'))
+el$sendKeysToElement(list('980354189'))
 
 
 el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
 el.1$highlightElement()
 
-el.1$sendKeysToElement(list('pass'))
+el.1$sendKeysToElement(list('652383'))
 el$sendKeysToElement(list(key='enter'))
 
 col <- c('062','063','064')
@@ -74,74 +74,19 @@ pick_qu <- remote_driver$findElement(using = 'xpath', '//*[@id="ctl08_ddlQuarter
 pick_qu$clickElement()
 #A782  = =  07 - 08 years, 2 =  fall.  If you want after 2010, must use B782, which would be fall 2017-18
 ##
-#remote_driver$navigate("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A782&qn=Fall 07&nc=false&in=&cr=")
+
+url <- "https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A782&qn=Fall 07&nc=false&in=&cr="
+remote_driver$navigate(url)
 
 url_item<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col[2],"&q=",q,"&qn=",qn,"&nc=false&in=&cr=")
 remote_driver$navigate(url_item)
 
 page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
+xpath.from.src <- "/html/body/form/div[3]/table[1]"
+page %>% html_nodes(.,xpath=xpath.from.src)->table.out
 
-page %>% html_nodes("#rptClusterRpt_ctl417_row") #reads the last tr row, 417
-page_tr<- page %>% html_nodes("tr") %>% html_text()
-
-rows<- page_tr %>% str_squish()
-grep('clus',rows,ignore.case=T)
-#return class=open
-##next, find the "cluster  class" xpath:  /html/body/form/div[3]/span[4]
+table.out %>% html_table(fill = T)-> enroll.report
 
 ##after this,  stip out the headers for each sub table--tricky because 2 rows with different headers.
 
-
-
-
-<td style="text-align: center; border-right: solid 1px #FFFFFF;">
-  9650
-</td>
-  <td style="text-align: left; padding-left: 4px; border-right: solid 1px #FFFFFF; white-space: nowrap;">
-  SSC  101&nbsp;D1</td>
-  <td style="border-right: solid 1px #FFFFFF;" width="*">
-  INTRO TO INFO RES FOR SS</td>
-  <td style="text-align: center; border-right: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_lblCredit">3</span>
-  </td>
-  <td style="border-right: solid 1px #FFFFFF; min-width: 50px;">
-  <span id="rptClusterRpt_ctl417_lbldays" style="font-weight:bold;">Online</span>
-  </td>
-  <td style="border-right: solid 1px #FFFFFF; white-space: nowrap;">
-  <span id="rptClusterRpt_ctl417_lblStartTime"><center>-</center></span>
-  </td>
-  <td style="border-right: solid 1px #FFFFFF; white-space: nowrap;">
-  <span id="rptClusterRpt_ctl417_lblEndTime"><center>-</center></span>
-  </td>
-  <td style="white-space: nowrap; border-right: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_lblRoom"><center>-</center></span>
-  </td>
-  <td style="border-right: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_Instructor">Avillar</span>
-  </td>
-  <td style="text-align: right; width: 20px;">
-  <b>3</b>
-  </td>
-  <td style="text-align: center;">/</td>
-  <td style="text-align: left; width: 20px; border-right: solid 1px #FFFFFF;">
-  <b class="small">18</b>
-  </td>
-  <td style="text-align: center;">
-  <span id="rptClusterRpt_ctl417_lblWaitList">0</span>
-  </td>
-  <td style="text-align: center; border-left: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_FTE">0.6</span>
-  </td>
-  <td style="text-align: center; border-left: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_FTE_state">0.2</span>
-  </td>
-  <td style="text-align: center; border-left: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_PRGindx">011</span></td>
-  <td style="text-align: center; border-left: solid 0px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_ORGindx">3G05</span></td>
-  <td style="text-align: center; border-left: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_adminUnit">KK</span></td>
-  <td style="text-align: center; border-left: solid 1px #FFFFFF;">
-  <span id="rptClusterRpt_ctl417_Cluster">9650B903</span>
-  </td>
