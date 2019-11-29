@@ -75,7 +75,7 @@ pick_qu$clickElement()
 #A782  = =  07 - 08 years, 2 =  fall.  If you want after 2010, must use B782, which would be fall 2017-18
 ##
 
-url <- "https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A782&qn=Fall 07&nc=false&in=&cr="
+url <- "https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A012&qn=Fall 01&nc=false&in=&cr="
 remote_driver$navigate(url)
 
 url_item<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col[2],"&q=",q,"&qn=",qn,"&nc=false&in=&cr=")
@@ -83,10 +83,13 @@ remote_driver$navigate(url_item)
 
 page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
-xpath.from.src <- "/html/body/form/div[3]/table[1]"
+xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
 page %>% html_nodes(.,xpath=xpath.from.src)->table.out
 
 table.out %>% html_table(fill = T)-> enroll.report
 
 ##after this,  stip out the headers for each sub table--tricky because 2 rows with different headers.
+
+
+xpath.from.src.clustered <- '/html/body/form/div[3]/table[2]'#clustered class table
 
