@@ -36,13 +36,13 @@ el$highlightElement()
 
 el$clickElement()
 
-el$sendKeysToElement(list('980354189'))
+el$sendKeysToElement(list('uid'))
 
 
 el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
 el.1$highlightElement()
 
-el.1$sendKeysToElement(list('652383'))
+el.1$sendKeysToElement(list('id'))
 el$sendKeysToElement(list(key='enter'))
 
 col <- c('062','063','064')
