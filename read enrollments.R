@@ -26,8 +26,8 @@ robotstxt:::get_robotstxt('https://inside.seattlecolleges.edu/default.aspx?svc=e
 driver <- rsDriver(browser =c("firefox"))
 ##https://github.com/ropensci/RSelenium/issues/116
 remote_driver <- driver[["client"]]
-remote_driver$open()
-#remote_driver$close()
+#remote_driver$open()
+
 remote_driver$navigate("https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment")
 RSelenium:::selKeys %>% names()
 remote_driver$refresh()
@@ -93,3 +93,6 @@ table.out %>% html_table(fill = T)-> enroll.report
 
 xpath.from.src.clustered <- '/html/body/form/div[3]/table[2]'#clustered class table
 
+
+
+remote_driver$close()
