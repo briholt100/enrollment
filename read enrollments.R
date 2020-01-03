@@ -35,8 +35,6 @@ col <- c('062','063','064') # central north south
 q <- c('B903')  #After 2010, 2019 verging on 2020, quarter: winter "3"
 qn <- c('Winter 20')
 
-col <- c('062','063','064')
-q <- c('B903')
 qnum <- c(1:4)
 year.start.num <- 9
 year.end.num <- 10
