@@ -36,15 +36,20 @@ q <- c('B903')  #After 2010, 2019 verging on 2020, quarter: winter "3"
 qn <- c('Winter 20')
 
 qnum <- c(1:4)
-year.start.num <- 9
-year.end.num <- 10
+year.start.num <- 0:9
+year.end.num <- 0:9
+###warning
+century <- c('A','B') #A is pre 2000, B is after
+#So, A232 is Fall 1992
+##or does it?
 
+# this for loop will create all combo's of quarter and year code ----------
+for (i in qnum){print(paste0('A',year.start.num,year.end.num+1,i))}
 
 qy <- c('Winter 20')
 season <- c("Summer","Fall","Winter","Spring")
 
-year.quarter<- paste0('B','.',rep(2019:2000,each=4),'.',4:1,'.',"y")
-year.quarter
+paste(season,0:20)
 
 cbind(year.quarter)
 
