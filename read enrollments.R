@@ -69,6 +69,12 @@ pick_qu$clickElement()
 
 url <- "https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A672&qn=Fall 06&nc=false&in=&cr="
 
+#summer 04 the 'new' AU codes went into effect
+
+# check valid request -----------------------------------------------------
+
+#this is the xpath for "sorry data not found page"
+#/html/body/form/div[3]/div[2]/div
 
 #
 # 1 scrape full page
