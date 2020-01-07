@@ -39,20 +39,39 @@ qnum <- c(1:4)
 year.start.num <- 0:9
 year.end.num <- 0:9
 ###warning
-century <- c('A','B') #A is pre 2000, B is after
+century <- c(8,9,'A','B') #A is pre 2000, B is after
 #So, A232 is Fall 1992
 ##or does it?
 
 # this for loop will create all combo's of quarter and year code ----------
-for (i in qnum){print(paste0('A',year.start.num,year.end.num+1,i))}
+quart.code<- expand.grid(century,0:9,0:9,1:4)
+colnames(quart.code) <- c("century","start.year","end.year","season")
+quart.code[quart.code$start.year >= quart.code$end.year  ,] <- NA
+qc<- quart.code[complete.cases(quart.code),]
 
-qy <- c('Winter 20')
+qc[order(qc$century,qc$start.year),]
+
+qc[(qc$century=='8' & qc$start.year< 4),] <- NA
+qc <- qc[complete.cases(qc),]
+qc[qc$end.year-qc$start.year >1,] <- NA
+qc <- qc[complete.cases(qc),]
+qc <- qc[order(qc$century,qc$start.year),]
+qc<- paste0(qc$century,qc$start.year,qc$end.year,qc$season)
+
+paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=",qc,"&qn=Fall 06&nc=false&in=&cr=")
+
+# create quarter year title -----------------------------------------------
+
 season <- c("Summer","Fall","Winter","Spring")
 
-paste(season,0:20)
+qy_title<- expand.grid(season,c(as.character(84:99),paste0("0",0:9),as.character(10:19)))
 
-cbind(year.quarter)
-
+for (i in 1:length(qc)){
+  if(substr(qc[i],start=4,stop=4)=='1') print("Summer") 
+    else if (substr(qc[i],start=4,stop=4)=='2') print("Fall")
+    else if (substr(qc[i],start=4,stop=4)=='3') print("Winter")
+    else print("Spring")
+}
 
 ##selecting college
 
