@@ -57,14 +57,31 @@ qc[qc$end.year-qc$start.year >1,] <- NA
 qc <- qc[complete.cases(qc),]
 qc <- qc[order(qc$century,qc$start.year),]
 qc<- paste0(qc$century,qc$start.year,qc$end.year,qc$season)
+# qc[-c(3:4)]
+paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col,"&q=",qc,"&qn=Fall 06&nc=false&in=&cr=")
 
-paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=",qc,"&qn=Fall 06&nc=false&in=&cr=")
+qc<- as.data.frame(qc)
+
+data.frame(qc) %>% mutate(qy=str_sub(qc,4,4))->qc_code
+
+substr(qc$qc,4,4)
 
 # create quarter year title -----------------------------------------------
 
-season <- c("Summer","Fall","Winter","Spring")
+for(i in 1:length(qc)){
+  if(substr(qc[i],start=4,stop=4)==1) 
+    {print(paste0("Summer ",substr(qc[i],start=1,stop=2)))}
+    else if(substr(qc[i],start=4,stop=4)==2) 
+    {print(paste0("Fall ",substr(qc[i],start=1,stop=2)))}
+    else if (substr(qc[i],start=4,stop=4)==3) 
+    {print(paste0("Winter ",substr(qc[i],start=1,stop=2)))}
+    else if (substr(qc[i],start=4,stop=4)==4) 
+    {print(paste0("Spring ",substr(qc[i],start=1,stop=2)))}
+}
 
-qy_title<- expand.grid(season,c(as.character(84:99),paste0("0",0:9),as.character(10:19)))
+
+
+
 
 for (i in 1:length(qc)){
   if(substr(qc[i],start=4,stop=4)=='1') print("Summer") 
