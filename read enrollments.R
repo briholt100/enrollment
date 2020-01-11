@@ -57,11 +57,22 @@ qc[qc$end.year-qc$start.year >1,] <- NA
 qc <- qc[complete.cases(qc),]
 qc <- qc[order(qc$century,qc$start.year),]
 qc<- paste0(qc$century,qc$start.year,qc$end.year,qc$season)
-
-paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col,"&q=",qc,"&qn=Fall 06&nc=false&in=&cr=")
+qc<- as.data.frame(qc)
 qc$qc <- as.character(qc$qc)
+
+colnames(qc) <- "code"
+
+missing <- data.frame(c('8901','8902','8903','8904',
+             '9901','9902','9903','9904',
+             'A901','A902','A903','A904'))
+colnames(missing) <- "code"
+
+qc <- rbind(qc,missing)
+
+qc<- qc[order(qc$code),]
 qc<- as.data.frame(qc)
 colnames(qc) <- "code"
+# create quarter year title -----------------------------------------------
 
 qc %>% select(code) %>% 
   mutate(
@@ -76,31 +87,14 @@ qc %>% select(code) %>%
 qc[,2] <- sub("A","0",qc$qy)
 qc[,2] <- sub("B","1",qc$qy)
 (qc)
-# create quarter year title -----------------------------------------------
-
-for(i in 1:length(qc)){
-  if(substr(qc[i],start=4,stop=4)==1) 
-    {print(paste0("Summer ",substr(qc[i],start=1,stop=2)))}
-    else if(substr(qc[i],start=4,stop=4)==2) 
-    {print(paste0("Fall ",substr(qc[i],start=1,stop=2)))}
-    else if (substr(qc[i],start=4,stop=4)==3) 
-    {print(paste0("Winter ",substr(qc[i],start=1,stop=2)))}
-    else if (substr(qc[i],start=4,stop=4)==4) 
-    {print(paste0("Spring ",substr(qc[i],start=1,stop=2)))}
-}
 
 
 
+paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col,"&q=",qc$code,"&qn=",qc$qy,"&nc=false&in=&cr=") 
+
+# selecting college -------------------------------------------------------
 
 
-for (i in 1:length(qc)){
-  if(substr(qc[i],start=4,stop=4)=='1') print("Summer") 
-    else if (substr(qc[i],start=4,stop=4)=='2') print("Fall")
-    else if (substr(qc[i],start=4,stop=4)=='3') print("Winter")
-    else print("Spring")
-}
-
-##selecting college
 
 pick_col<- remote_driver$findElement(using = 'xpath', '//*[@id="ctl08_ddlCollegeView"]')
 pick_col$highlightElement()
