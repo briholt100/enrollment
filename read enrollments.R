@@ -57,15 +57,25 @@ qc[qc$end.year-qc$start.year >1,] <- NA
 qc <- qc[complete.cases(qc),]
 qc <- qc[order(qc$century,qc$start.year),]
 qc<- paste0(qc$century,qc$start.year,qc$end.year,qc$season)
-# qc[-c(3:4)]
+
 paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col,"&q=",qc,"&qn=Fall 06&nc=false&in=&cr=")
-
+qc$qc <- as.character(qc$qc)
 qc<- as.data.frame(qc)
+colnames(qc) <- "code"
 
-data.frame(qc) %>% mutate(qy=str_sub(qc,4,4))->qc_code
+qc %>% select(code) %>% 
+  mutate(
+        qy=case_when(
+          substr(code,4,4)=="1"~paste0("Summer ",substr(code,1,2)),
+          substr(code,4,4)=="2"~paste0("Fall ",substr(code,1,2)),
+          substr(code,4,4)=="3"~paste0("Winter ",substr(code,1,1),substr(code,3,3)),
+          substr(code,4,4)=="4"~paste0("Spring ",substr(code,1,1),substr(code,3,3))
+      )
+)->qc
 
-substr(qc$qc,4,4)
-
+qc[,2] <- sub("A","0",qc$qy)
+qc[,2] <- sub("B","1",qc$qy)
+(qc)
 # create quarter year title -----------------------------------------------
 
 for(i in 1:length(qc)){
