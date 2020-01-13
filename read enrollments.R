@@ -87,8 +87,8 @@ qc %>% select(code) %>%
 qc[,2] <- sub("A","0",qc$qy)
 qc[,2] <- sub("B","1",qc$qy)
 (qc)
-
-
+##Items #23,24,63,64 are wrong
+qc[23,]
 
 paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",col,"&q=",qc$code,"&qn=",qc$qy,"&nc=false&in=&cr=") 
 
