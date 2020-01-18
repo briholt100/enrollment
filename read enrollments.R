@@ -29,6 +29,10 @@ el.1$sendKeysToElement(list('id'))
 el$sendKeysToElement(list(key='enter'))
 
 
+
+
+# Components of dataframe -------------------------------------------------
+
 # 1 select college , quarter and year navigate to that page
 
 col <- c('062','063','064') # central north south
@@ -63,8 +67,8 @@ qc$qc <- as.character(qc$qc)
 colnames(qc) <- "code"
 
 missing <- data.frame(c('8901','8902','8903','8904',
-             '9901','9902','9903','9904',
-             'A901','A902','A903','A904'))
+                        '9901','9902','9903','9904',
+                        'A901','A902','A903','A904'))
 colnames(missing) <- "code"
 
 qc <- rbind(qc,missing)
@@ -72,39 +76,10 @@ qc <- rbind(qc,missing)
 qc<- qc[order(qc$code),]
 qc<- as.data.frame(qc)
 colnames(qc) <- "code"
-# create quarter year title -----------------------------------------------
-
-qc %>% select(code) %>% 
-  mutate(
-        qy=case_when(
-          substr(code,4,4)=="1"~paste0("Summer ",substr(code,1,2)),
-          substr(code,4,4)=="2"~paste0("Fall ",substr(code,1,2)),
-          substr(code,4,4)=="3"~paste0("Winter ",substr(code,1,1),substr(code,3,3)),
-          substr(code,4,4)=="4"~paste0("Spring ",substr(code,1,1),substr(code,3,3))
-      )
-)->qc
-
-qc[,2] <- sub("A","0",qc$qy)
-qc[,2] <- sub("B","1",qc$qy)
-(qc)
-##Items #23,24,63,64 are wrong; fix below
-qc[23,2] <- "Winter 90"
-qc[24,2] <- "Spring 90"
-qc[63,2] <- "Winter 00"
-qc[64,2] <- "Spring 00"
 
 
-# Adding to the corpus ----------------------------------------------------
+# Create main dataframe ---------------------------------------------------
 
-
-qc[141,] <- c("B901","Summer 19")
-qc[142,] <- c("B902","Fall 19")
-qc[143,] <- c("B903","Winter 20")
-qc[144,] <- c("B904","Spring 20")
-qc
-# Make URL Corpus ---------------------------------------------------------
-
-#create df to house URL's
 main.df<- data.frame(matrix(ncol=11,nrow=3*nrow(qc)))
 colnames(main.df) <- c('Date_acc','Time_acc',
                        'college',
@@ -116,7 +91,7 @@ colnames(main.df) <- c('Date_acc','Time_acc',
                        'site_clus_enrol',
                        'scrap_clus_enrol',
                        'clus_diff')
-                       
+
 Sys.Date()
 Sys.time()
 
@@ -151,14 +126,50 @@ yr<- main.df %>%  select(code) %>%
 
 
 
-  for (i in 1:nrow(main.df)){
-    main.df$URL.link<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",main.df$college[i],"&q=",quarter.year,"&qn=",qc$qy[j],"&nc=false&in=&cr=")
-    }
+for (i in 1:nrow(main.df)){
+  main.df$URL.link<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",main.df$college[i],"&q=",quarter.year,"&qn=",qc$qy[j],"&nc=false&in=&cr=")
+}
 
 for (i in 1:length(main.df$URL.link)){
   if(substr(main.df$URL.link[i],start=78,stop=80 )=='064'){print(i);print(T)}
   
 }
+
+
+
+
+# create quarter year title -----------------------------------------------
+
+qc %>% select(code) %>% 
+  mutate(
+        qy=case_when(
+          substr(code,4,4)=="1"~paste0("Summer ",substr(code,1,2)),
+          substr(code,4,4)=="2"~paste0("Fall ",substr(code,1,2)),
+          substr(code,4,4)=="3"~paste0("Winter ",substr(code,1,1),substr(code,3,3)),
+          substr(code,4,4)=="4"~paste0("Spring ",substr(code,1,1),substr(code,3,3))
+      )
+)->qc
+
+qc[,2] <- sub("A","0",qc$qy)
+qc[,2] <- sub("B","1",qc$qy)
+(qc)
+##Items #23,24,63,64 are wrong; fix below
+qc[23,2] <- "Winter 90"
+qc[24,2] <- "Spring 90"
+qc[63,2] <- "Winter 00"
+qc[64,2] <- "Spring 00"
+
+
+# Adding to the corpus ----------------------------------------------------
+
+
+qc[141,] <- c("B901","Summer 19")
+qc[142,] <- c("B902","Fall 19")
+qc[143,] <- c("B903","Winter 20")
+qc[144,] <- c("B904","Spring 20")
+qc
+# Make URL Corpus ---------------------------------------------------------
+
 
 # selecting college -------------------------------------------------------
 
