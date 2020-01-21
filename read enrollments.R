@@ -113,18 +113,25 @@ main.df <- cbind(main.df[,1:4],Season,main.df[5:11])
 
 #main.df$yr <- 
 
-yr<- main.df %>%  select(code) %>% 
-  transmute(
-    yr=case_when(
-      substr(code,4,4)=="1"~paste0(substr(code,1,2)),
-      substr(code,4,4)=="2"~paste0(substr(code,1,2)),
-      substr(code,4,4)=="3"~paste0(substr(code,1,1),substr(code,3,3)),
-      substr(code,4,4)=="4"~paste0(substr(code,1,1),substr(code,3,3))
+ main.df<- main.df %>%
+    mutate(
+      yr=case_when(
+        substr(code,4,4)=="1"~paste0(substr(code,1,2)),
+        substr(code,4,4)=="2"~paste0(substr(code,1,2)),
+        substr(code,4,4)=="3"~paste0(substr(code,1,1),substr(code,3,3)),
+        substr(code,4,4)=="4"~paste0(substr(code,1,1),substr(code,3,3))
+      )
     )
-  )
+ main.df[,c("code","yr")]
+ main.df$yr <- sub('B(.)','1\\1',main.df$yr)
+ main.df[,c("code","yr")]
+main.df$yr <- sub('A(.)','0\\1',main.df$yr)
+
+#main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',main.df$yr <- '00',main.df$yr)
 
 
 
+main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season,"&nc=false&in=&cr="))
 
 for (i in 1:nrow(main.df)){
   main.df$URL.link<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",main.df$college[i],"&q=",quarter.year,"&qn=",qc$qy[j],"&nc=false&in=&cr=")
