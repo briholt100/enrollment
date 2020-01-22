@@ -77,15 +77,26 @@ qc<- qc[order(qc$code),]
 qc<- as.data.frame(qc)
 colnames(qc) <- "code"
 
+# Adding to the corpus ----------------------------------------------------
+
+
+qc[141,] <- "B901" # "Summer 19"
+qc[142,] <- "B902" #"Fall 19")
+qc[143,] <- "B903" #"Winter 20")
+#qc[144,] <- "B904" #"Spring 20")
+
+
+
 
 # Create main dataframe ---------------------------------------------------
 
-main.df<- data.frame(matrix(ncol=11,nrow=3*nrow(qc)))
+main.df<- data.frame(matrix(ncol=12,nrow=3*nrow(qc)))
 colnames(main.df) <- c('Date_acc','Time_acc',
                        'college',
                        'code',
                        'URL.link',
                        'site_enrol',
+                       'scrap_tbl',
                        'scrap_enrol',
                        'enrol_diff',
                        'site_clus_enrol',
@@ -93,21 +104,20 @@ colnames(main.df) <- c('Date_acc','Time_acc',
                        'clus_diff')
 
 
-main.df[,3:4] <- expand.grid(col,qc$code)    ##creates all possible combinations of college and code
+main.df[,c("college","code")] <- expand.grid(col,qc$code)    ##creates all possible combinations of college and code
 main.df <- main.df[order(main.df$college),]   ##sorts by collge
 rownames(main.df) <- 1:nrow(main.df)          ##renames rown names so that they are in order
 
-Season <- main.df %>% select(code) %>%        ##creates a new column of seasons. 
-  transmute(
+main.df <- main.df %>% 
+  mutate(
     Season=case_when(
       substr(code,4,4)=="1"~paste0("Summer"),
       substr(code,4,4)=="2"~paste0("Fall"),
       substr(code,4,4)=="3"~paste0("Winter"),
       substr(code,4,4)=="4"~paste0("Spring")
     )
-  )
+  ) %>% select(Date_acc:code,Season,URL.link:length(main.df))
 
-main.df <- cbind(main.df[,1:4],Season,main.df[5:11])   ##squeezes new variable bw code and url
 
  main.df<- main.df %>%                              ##creates new 'yr' variable to be paired with season in URL
     mutate(
@@ -123,11 +133,12 @@ main.df <- cbind(main.df[,1:4],Season,main.df[5:11])   ##squeezes new variable b
 main.df$yr <- sub('B(.)','1\\1',main.df$yr)
 main.df$yr <- sub('A(.)','0\\1',main.df$yr)
 
+main.df$yr <- ifelse(main.df$yr =="10" & substr(main.df$code,1,3)=='B90',"20",main.df$yr)
 main.df$yr <- ifelse(main.df$yr =="00" & substr(main.df$code,1,3)=='A90',"10",main.df$yr)
 main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',"00",main.df$yr)
 main.df$yr <- ifelse(main.df$yr =="80" & substr(main.df$code,1,3)=='890',"90",main.df$yr)
 
-
+main.df <- main.df[,c(1:5,13,6:12)]  #reorder columns
 # Create official link to scrape ------------------------------------------
 
 
@@ -138,50 +149,30 @@ Sys.time()
 main.df<- main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season," ",yr,"&nc=false&in=&cr=")) 
 
 
-for (i in 1:length(main.df$URL.link)){
-  if(substr(main.df$URL.link[i],start=78,stop=80 )=='064'){print(i);print(T)}
-  
-}
+
+# Do the crawl ------------------------------------------------------------
+
+# pseudo code
+
+# 1. start selenium and open browser
+# 2. log in to inside colleges
+# 3. for each URL, 
+#   3a. open page
+#   3b. store sys date and time
+#   3c. Check for bad connection (if bad, stop)
+#   3d. find and scrape site enrollment  #for comparisons
+#   3e. scrape full table and store
+#   3g. find and scrape site enrollment of clustered classes  #for comparisons
+#   3h. scrape clusterd table and store
+
+# 4. calculate:  
+#   4a. differences between site and scraped (2 differences)
+#   4b. calc and store scraped enrollments # single number for a quick glance
 
 
-
-
-# create quarter year title -----------------------------------------------
-
-qc %>% select(code) %>% 
-  mutate(
-        qy=case_when(
-          substr(code,4,4)=="1"~paste0("Summer ",substr(code,1,2)),
-          substr(code,4,4)=="2"~paste0("Fall ",substr(code,1,2)),
-          substr(code,4,4)=="3"~paste0("Winter ",substr(code,1,1),substr(code,3,3)),
-          substr(code,4,4)=="4"~paste0("Spring ",substr(code,1,1),substr(code,3,3))
-      )
-)->qc
-
-qc[,2] <- sub("A","0",qc$qy)
-qc[,2] <- sub("B","1",qc$qy)
-(qc)
-##Items #23,24,63,64 are wrong; fix below
-qc[23,2] <- "Winter 90"
-qc[24,2] <- "Spring 90"
-qc[63,2] <- "Winter 00"
-qc[64,2] <- "Spring 00"
-
-
-# Adding to the corpus ----------------------------------------------------
-
-
-qc[141,] <- c("B901","Summer 19")
-qc[142,] <- c("B902","Fall 19")
-qc[143,] <- c("B903","Winter 20")
-qc[144,] <- c("B904","Spring 20")
-qc
-# Make URL Corpus ---------------------------------------------------------
 
 
 # selecting college -------------------------------------------------------
-
-
 
 pick_col<- remote_driver$findElement(using = 'xpath', '//*[@id="ctl08_ddlCollegeView"]')
 pick_col$highlightElement()
