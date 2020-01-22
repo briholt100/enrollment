@@ -127,9 +127,10 @@ main.df <- cbind(main.df[,1:4],Season,main.df[5:11])
  main.df[,c("code","yr")]
 main.df$yr <- sub('A(.)','0\\1',main.df$yr)
 
-#main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',main.df$yr <- '00',main.df$yr)
+main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',"00",main.df$yr)
 
-
+#  if(substr(x,1,3) == "890" & y == "80") {y <- "90"}}
+#apply(main.df[,c("code","yr")],1,function(x) correct_year(x[,1],x[,2]))
 
 main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season,"&nc=false&in=&cr="))
 
