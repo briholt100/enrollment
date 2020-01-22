@@ -92,14 +92,12 @@ colnames(main.df) <- c('Date_acc','Time_acc',
                        'scrap_clus_enrol',
                        'clus_diff')
 
-Sys.Date()
-Sys.time()
 
-main.df[,3:4] <- expand.grid(col,qc$code)
-main.df <- main.df[order(main.df$college),]
-rownames(main.df) <- 1:nrow(main.df)
+main.df[,3:4] <- expand.grid(col,qc$code)    ##creates all possible combinations of college and code
+main.df <- main.df[order(main.df$college),]   ##sorts by collge
+rownames(main.df) <- 1:nrow(main.df)          ##renames rown names so that they are in order
 
-Season <- main.df %>% select(code) %>% 
+Season <- main.df %>% select(code) %>%        ##creates a new column of seasons. 
   transmute(
     Season=case_when(
       substr(code,4,4)=="1"~paste0("Summer"),
@@ -108,12 +106,10 @@ Season <- main.df %>% select(code) %>%
       substr(code,4,4)=="4"~paste0("Spring")
     )
   )
-main.df <- cbind(main.df[,1:4],Season,main.df[5:11])
 
+main.df <- cbind(main.df[,1:4],Season,main.df[5:11])   ##squeezes new variable bw code and url
 
-#main.df$yr <- 
-
- main.df<- main.df %>%
+ main.df<- main.df %>%                              ##creates new 'yr' variable to be paired with season in URL
     mutate(
       yr=case_when(
         substr(code,4,4)=="1"~paste0(substr(code,1,2)),
@@ -122,21 +118,25 @@ main.df <- cbind(main.df[,1:4],Season,main.df[5:11])
         substr(code,4,4)=="4"~paste0(substr(code,1,1),substr(code,3,3))
       )
     )
- main.df[,c("code","yr")]
- main.df$yr <- sub('B(.)','1\\1',main.df$yr)
- main.df[,c("code","yr")]
+
+ # Makes these data tidy and accurate
+main.df$yr <- sub('B(.)','1\\1',main.df$yr)
 main.df$yr <- sub('A(.)','0\\1',main.df$yr)
 
+main.df$yr <- ifelse(main.df$yr =="00" & substr(main.df$code,1,3)=='A90',"10",main.df$yr)
 main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',"00",main.df$yr)
+main.df$yr <- ifelse(main.df$yr =="80" & substr(main.df$code,1,3)=='890',"90",main.df$yr)
 
-#  if(substr(x,1,3) == "890" & y == "80") {y <- "90"}}
-#apply(main.df[,c("code","yr")],1,function(x) correct_year(x[,1],x[,2]))
 
-main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season,"&nc=false&in=&cr="))
+# Create official link to scrape ------------------------------------------
 
-for (i in 1:nrow(main.df)){
-  main.df$URL.link<- paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",main.df$college[i],"&q=",quarter.year,"&qn=",qc$qy[j],"&nc=false&in=&cr=")
-}
+
+Sys.Date()
+Sys.time()
+
+
+main.df<- main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season," ",yr,"&nc=false&in=&cr=")) 
+
 
 for (i in 1:length(main.df$URL.link)){
   if(substr(main.df$URL.link[i],start=78,stop=80 )=='064'){print(i);print(T)}
