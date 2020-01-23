@@ -138,7 +138,8 @@ main.df$yr <- ifelse(main.df$yr =="00" & substr(main.df$code,1,3)=='A90',"10",ma
 main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',"00",main.df$yr)
 main.df$yr <- ifelse(main.df$yr =="80" & substr(main.df$code,1,3)=='890',"90",main.df$yr)
 
-main.df <- main.df[,c(1:5,13,6:12)]  #reorder columns
+main.df <- main.df %>% 
+  select(1:5,yr,URL.link:clus_diff)  #reorder columns
 # Create official link to scrape ------------------------------------------
 
 
@@ -146,7 +147,9 @@ Sys.Date()
 Sys.time()
 
 
-main.df<- main.df %>% mutate(URL.link=paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season," ",yr,"&nc=false&in=&cr=")) 
+main.df<- main.df %>% 
+  mutate(URL.link=
+           paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season," ",yr,"&nc=false&in=&cr=")) 
 
 
 
