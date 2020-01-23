@@ -212,7 +212,7 @@ page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
 # 1a scrape site's campus and quarter/year
 #
-# 2. scrape and tidy generated eroll count
+# 2. scrape and tidy generated enroll count
 # get site generated count for all non clusterd classes: ------------------
 
 xpath.from.src <- '//*[@id="lblEnrollNon"]'  #xpath for total from the bottom of site page
