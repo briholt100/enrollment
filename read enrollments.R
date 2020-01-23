@@ -1,35 +1,4 @@
-library(RSelenium)
-library(rvest)
 library(tidyverse)
-
-
-#Using selenium
-# sign in to inside seattle colleges --------------------------------------
-
-driver <- rsDriver(browser =c("firefox"))
-##https://github.com/ropensci/RSelenium/issues/116
-remote_driver <- driver[["client"]]
-#remote_driver$close()
-
-remote_driver$navigate("https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment")
-RSelenium:::selKeys %>% names()
-remote_driver$refresh()
-el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]')
-el$highlightElement()
-
-el$clickElement()
-
-el$sendKeysToElement(list('uid'))
-
-
-el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
-el.1$highlightElement()
-
-el.1$sendKeysToElement(list('id'))
-el$sendKeysToElement(list(key='enter'))
-
-
-
 
 # Components of dataframe -------------------------------------------------
 
@@ -158,7 +127,41 @@ main.df<- main.df %>%
 # pseudo code
 
 # 1. start selenium and open browser
-# 2. log in to inside colleges
+
+#Using Rselenium
+library(RSelenium)
+library(rvest)
+
+# Open driver and sign in to inside seattle colleges --------------------------------------
+
+driver <- rsDriver(browser =c("firefox"))
+##https://github.com/ropensci/RSelenium/issues/116
+remote_driver <- driver[["client"]]
+#remote_driver$close()
+
+remote_driver$navigate("https://inside.seattlecolleges.edu/default.aspx?svc=enrollment&page=enrollment")
+RSelenium:::selKeys %>% names()
+remote_driver$refresh()
+
+
+
+# 2. log in to inside colleges ------------------------------------------
+
+el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]')
+el$highlightElement()
+
+el$clickElement()
+
+el$sendKeysToElement(list('uid'))  #change to user ID
+el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
+el.1$highlightElement()
+
+el.1$sendKeysToElement(list('id'))  #change to Pass ID
+el$sendKeysToElement(list(key='enter'))
+
+
+
+
 # 3. for each URL, 
 #   3a. open page
 #   3b. store sys date and time
