@@ -13,8 +13,6 @@ year.start.num <- 0:9
 year.end.num <- 0:9
 ###warning
 century <- c(8,9,'A','B') #A is pre 2000, B is after
-#So, A232 is Fall 1992
-##or does it?
 
 # this for loop will create all combo's of quarter and year code ----------
 quart.code<- expand.grid(century,0:9,0:9,1:4)
@@ -48,14 +46,10 @@ colnames(qc) <- "code"
 
 # Adding to the corpus ----------------------------------------------------
 
-
 qc[141,] <- "B901" # "Summer 19"
 qc[142,] <- "B902" #"Fall 19")
 qc[143,] <- "B903" #"Winter 20")
 #qc[144,] <- "B904" #"Spring 20")
-
-
-
 
 # Create main dataframe ---------------------------------------------------
 
@@ -98,7 +92,8 @@ main.df <- main.df %>%
       )
     )
 
- # Makes these data tidy and accurate
+# Makes these data tidy and accurate
+ 
 main.df$yr <- sub('B(.)','1\\1',main.df$yr)
 main.df$yr <- sub('A(.)','0\\1',main.df$yr)
 
@@ -118,8 +113,6 @@ Sys.time()
 main.df<- main.df %>% 
   mutate(URL.link=
            paste0("https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=",college,"&q=",code,"&qn=",Season," ",yr,"&nc=false&in=&cr=")) 
-
-
 
 # Do the crawl ------------------------------------------------------------
 
@@ -222,51 +215,8 @@ temp
 #this is the xpath for "sorry data not found page"
 #/html/body/form/div[3]/div[2]/div
 
-#
-# 1 scrape full page
-
-remote_driver$navigate(url)
-
-page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
-
-
-
-
-# 1a scrape site's campus and quarter/year
-#
-# 2. scrape and tidy generated enroll count
-# get site generated count for all non clusterd classes: ------------------
-
-xpath.from.src <- '//*[@id="lblEnrollNon"]'  #xpath for total from the bottom of site page
-page %>% html_nodes(.,xpath=xpath.from.src)->node.out
-site.enrolled.count<- html_text (node.out)
-site.enrolled.count<- as.numeric(sub(",","",site.enrolled.count))
-
-site.enrolled.count
-
-#
-# 3. scrape and tidy main table
-#
-xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
-page %>% html_nodes(.,xpath=xpath.from.src)->table.out
-
-table.out %>% html_table(fill = T)-> enroll.report
-
-### the following just saves a single enroll.report for practice in tidying
-remote_driver$navigate(url.1)
-
-save(enroll.report,file='enroll_report.RData')
-
-
-
-
 
 ##after this,  stip out the headers for each sub table--tricky because 2 rows with different headers.
-
-
-
-
-
 
 remote_driver$close()
 
@@ -375,6 +325,15 @@ for (i in 1:nrow(temp)){
   str(d)
   temp$scrap_tbl[[i]] <- d
 }
+
+
+# check for differences between site and tabulated enrollments ------------
+
+for (i in 1:nrow(temp)){
+ print( sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)-temp$site_enrol[[i]])
+}
+
+
 
 # 4. count enrollments
 
