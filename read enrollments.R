@@ -204,8 +204,9 @@ for (i in 1:nrow(main.df)){
     
     main.df$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
     
+    print(paste("we are on iteration ",i))
 }
-main.df
+save(main.df,file = "main.df")
 
 #temp[,c(7,11)]
 
@@ -284,6 +285,8 @@ for (i in 1:nrow(main.df)){
 for (i in 1:nrow(main.df)){
   print( sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)-main.df$site_enrol[[i]])
 }
+
+head(main.df[,c(1:5,7,9:11,13:14)])
 
 # 4. count enrollments
 
