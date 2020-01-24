@@ -153,18 +153,18 @@ el.1$sendKeysToElement(list('pid'))  #change to Pass ID
 el$sendKeysToElement(list(key='enter'))
 
 
-temp <- main.df[sample(1:nrow(main.df),3),]
-temp[,2:5]
+#temp <- main.df[sample(1:nrow(main.df),10),]
+#temp[,2:5]
 
 
-system.time(for (i in 1:nrow(temp)){
-  temp$Date_Time_acc <- Sys.time()
-  remote_driver$navigate(temp$URL.link[i])
-  print(temp$URL.link[i])
+for (i in 1:nrow(main.df)){
+  main.df$Date_Time_acc[i] <- Sys.time()
+  remote_driver$navigate(main.df$URL.link[i])
+  print(main.df$URL.link[i])
   
   #insert system delay
   
-  Sys.sleep(sample(0:2,1))
+  #Sys.sleep(sample(0:2,1))
   
   page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
@@ -177,7 +177,7 @@ system.time(for (i in 1:nrow(temp)){
     site.enrolled.count<- html_text (node.out)
     site.enrolled.count<- as.numeric(sub(",","",site.enrolled.count))
     
-  temp$site_enrol[i] <- site.enrolled.count
+  main.df$site_enrol[i] <- site.enrolled.count
   
   # below uses xpath to pull the site reported count
   
@@ -187,14 +187,14 @@ system.time(for (i in 1:nrow(temp)){
     print(node.out)
     site.clust.enrolled.count<- html_text (node.out)
     site.clust.enrolled.count<- as.numeric(sub(",","",site.clust.enrolled.count))
-    temp$site_clus_enrol[i] <- site.clust.enrolled.count
+    main.df$site_clus_enrol[i] <- site.clust.enrolled.count
     
     # full table
     
     xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
     page %>% html_nodes(.,xpath=xpath.from.src)->table.out
     
-    temp$scrap_tbl[i]<- table.out %>% html_table(fill = T)
+    main.df$scrap_tbl[i]<- table.out %>% html_table(fill = T)
 	
 	
 # clustered table
@@ -202,11 +202,12 @@ system.time(for (i in 1:nrow(temp)){
     xpath.from.src <- "/html/body/form/div[3]/table[2]" #xpath for clusterd classes
     page %>% html_nodes(.,xpath=xpath.from.src)->table.out
     
-    temp$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
+    main.df$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
     
-})
+}
+main.df
 
-temp[,c(7,11)]
+#temp[,c(7,11)]
 
 # 3. for each URL, 
 #   3a. open page
@@ -235,13 +236,14 @@ temp[,c(7,11)]
 
 ##after this,  stip out the headers for each sub table--tricky because 2 rows with different headers.
 
-remote_driver$close()
+#remote_driver$close()
 
 # clean and update non-clustered --------------------------------------------
-for (i in 1:nrow(temp)){
+for (i in 1:nrow(main.df)){
   #load("enroll_report.RData")
-  d<- temp$scrap_tbl[i]#    enroll.report[[1]]
+  d<- main.df$scrap_tbl[i]#    enroll.report[[1]]
   d <- d[[1]]
+  head(d)
   # Get and correct column names --------------------------------------------
   
   var.names <- d[1,]
@@ -252,7 +254,7 @@ for (i in 1:nrow(temp)){
   # The following drops non-data rows
   d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
   head(d)
-  
+
   d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
   head(d)
   str(d)
@@ -272,15 +274,15 @@ for (i in 1:nrow(temp)){
   col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
   d[col.names] <- lapply(d[col.names],factor)
   str(d)
-  temp$scrap_tbl[[i]] <- d
-  temp$scrap_enrol[i] <- sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)
+  main.df$scrap_tbl[[i]] <- d
+  main.df$scrap_enrol[i] <- sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)
 }
 
 
 # check for differences between site and tabulated enrollments ------------
 
-for (i in 1:nrow(temp)){
-  print( sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)-temp$site_enrol[[i]])
+for (i in 1:nrow(main.df)){
+  print( sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)-main.df$site_enrol[[i]])
 }
 
 # 4. count enrollments
@@ -311,10 +313,9 @@ sum(d$Enrolled)-site.enrolled.count
 # difference between site and scraped enrollment
 
 
-=======
 # Clean ----------------------------------------------------------
-for (i in 1:nrow(temp)){
-  d <- temp$scrap_tbl[[i]]
+for (i in 1:nrow(main.df)){
+  d <- main.df$scrap_tbl[[i]]
   
   # Get and correct column names --------------------------------------------
   
@@ -346,7 +347,7 @@ for (i in 1:nrow(temp)){
   col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
   d[col.names] <- lapply(d[col.names],factor)
   str(d)
-  temp$scrap_tbl[[i]] <- d
+  main.df$scrap_tbl[[i]] <- d
 }
 
 
