@@ -59,8 +59,8 @@ qc[143,] <- "B903" #"Winter 20")
 
 # Create main dataframe ---------------------------------------------------
 
-main.df<- data.frame(matrix(ncol=11,nrow=3*nrow(qc)))
-colnames(main.df) <- c('Date_Time_acc',
+main.df<- data.frame(matrix(ncol=12,nrow=3*nrow(qc)))
+colnames(main.df) <- c('Date_acc','Time_acc',
                        'college',
                        'code',
                        'URL.link',
@@ -85,7 +85,7 @@ main.df <- main.df %>%
       substr(code,4,4)=="3"~paste0("Winter"),
       substr(code,4,4)=="4"~paste0("Spring")
     )
-  ) %>% select(Date_Time_acc:code,Season,URL.link:length(main.df))
+  ) %>% select(Date_acc:code,Season,URL.link:length(main.df))
 
 
  main.df<- main.df %>%                              ##creates new 'yr' variable to be paired with season in URL
@@ -108,10 +108,11 @@ main.df$yr <- ifelse(main.df$yr =="90" & substr(main.df$code,1,3)=='990',"00",ma
 main.df$yr <- ifelse(main.df$yr =="80" & substr(main.df$code,1,3)=='890',"90",main.df$yr)
 
 main.df <- main.df %>% 
-  select(Date_Time_acc:Season,yr,URL.link:clus_diff)  #reorder columns
+  select(1:5,yr,URL.link:clus_diff)  #reorder columns
 # Create official link to scrape ------------------------------------------
 
 
+Sys.Date()
 Sys.time()
 
 
@@ -159,44 +160,7 @@ el.1$sendKeysToElement(list('pid'))  #change to Pass ID
 el$sendKeysToElement(list(key='enter'))
 
 
-temp <- main.df[sample(1:nrow(main.df),3),]
-for (i in 1:nrow(temp)){
-  temp$Date_Time_acc <- Sys.time()
-  remote_driver$navigate(temp$URL.link[i])
-  print(temp$URL.link[i])
-  page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
-  # below uses xpath to pull the site reported count
-    xpath.from.src <- '//*[@id="lblEnrollNon"]'  #xpath for total from the bottom of site page
-  
-    page %>% html_nodes(.,xpath=xpath.from.src)->node.out
-    
-  print(node.out)
-    site.enrolled.count<- html_text (node.out)
-    site.enrolled.count<- as.numeric(sub(",","",site.enrolled.count))
-    
-  temp$site_enrol[i] <- site.enrolled.count
-  
-  # below uses xpath to pull the site reported count
-  
-  xpath.from.src.clustered <- '//*[@id="lblEnrollCluster"]'#clustered class table
-    page %>% html_nodes(.,xpath=xpath.from.src.clustered)->node.out
-  
-    print(node.out)
-    site.clust.enrolled.count<- html_text (node.out)
-    site.clust.enrolled.count<- as.numeric(sub(",","",site.clust.enrolled.count))
-    temp$site_clus_enrol[i] <- site.clust.enrolled.count
-    
-    # full table
-    
-    xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
-    page %>% html_nodes(.,xpath=xpath.from.src)->table.out
-    
-    temp$scrap_tbl[i]<- table.out %>% html_table(fill = T)
-    
-}
-
-temp
 
 # 3. for each URL, 
 #   3a. open page
@@ -214,6 +178,20 @@ temp
 
 
 
+# selecting college -------------------------------------------------------
+
+pick_col<- remote_driver$findElement(using = 'xpath', '//*[@id="ctl08_ddlCollegeView"]')
+pick_col$highlightElement()
+##selecting quarter
+pick_qu <- remote_driver$findElement(using = 'xpath', '//*[@id="ctl08_ddlQuarterView"]')
+pick_qu$clickElement()
+#A782  = =  07 - 08 years, 2 =  fall.  If you want after 2010, must use B782, which would be fall 2017-18
+##
+
+# The following beings with fall 2006 at North, noted by these  --------
+# col=063&q=A012&qn=Fall 01
+
+url <- "https://inside.seattlecolleges.edu/enrollment/content/displayReport.aspx?col=063&q=A672&qn=Fall 06&nc=false&in=&cr="
 
 #summer 04 the 'new' AU codes went into effect
 
@@ -264,47 +242,50 @@ save(enroll.report,file='enroll_report.RData')
 ##after this,  stip out the headers for each sub table--tricky because 2 rows with different headers.
 
 
-
+xpath.from.src.clustered <- '/html/body/form/div[3]/table[2]'#clustered class table
 
 
 
 remote_driver$close()
 
-# Load and Clean ----------------------------------------------------------
+# Clean ----------------------------------------------------------
+for (i in 1:nrow(temp)){
+  d <- temp$scrap_tbl[[i]]
+  
+  # Get and correct column names --------------------------------------------
+  
+  var.names <- d[1,]
+  colnames(d) <- var.names
+  
+  colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
+  
+  # The following drops non-data rows
+  d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
+  head(d)
+  
+  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
+  head(d)
+  str(d)
+  
+  # drop 'divider', var number 11
+  d<- d[,-11]
+  
+  # convert variables to factors, int, numeric ------------------------------
+  
+  #num:  4,10:14
+  d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
+  
+  #time: 6:7
+  # d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
+  
+  # factor: 1:3,5,8:9,15:18
+  col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
+  d[col.names] <- lapply(d[col.names],factor)
+  str(d)
+  temp$scrap_tbl[[i]] <- d
+}
 
-#load("enroll_report.RData")
-d<- enroll.report[[1]]
 
-# Get and correct column names --------------------------------------------
-
-var.names <- d[1,]
-colnames(d) <- var.names
-
-colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
-
-# The following drops non-data rows
-d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
-head(d)
-
-d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
-head(d)
-str(d)
-
-# drop 'divider', var number 11
-d<- d[,-11]
-
-# convert variables to factors, int, numeric ------------------------------
-
-#num:  4,10:14
-d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
-
-#time: 6:7
-# d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
-
-# factor: 1:3,5,8:9,15:18
-col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
-d[col.names] <- lapply(d[col.names],factor)
-str(d)
 
 # 4. count enrollments
 
@@ -339,66 +320,6 @@ sum(d$Enrolled)-site.enrolled.count
 
 
 
-for (i in 1:nrow(temp)){
-  #load("enroll_report.RData")
-  d<- temp$scrap_tbl[i]#    enroll.report[[1]]
-  d <- d[[1]]
-  # Get and correct column names --------------------------------------------
-  
-  var.names <- d[1,]
-  colnames(d) <- var.names
-  
-  colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
-  
-  # The following drops non-data rows
-  d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
-  head(d)
-  
-  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
-  head(d)
-  str(d)
-  
-  # drop 'divider', var number 11
-  d<- d[,-11]
-  
-  # convert variables to factors, int, numeric ------------------------------
-  
-  #num:  4,10:14
-  d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
-  
-  #time: 6:7
-  # d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
-  
-  # factor: 1:3,5,8:9,15:18
-  col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
-  d[col.names] <- lapply(d[col.names],factor)
-  str(d)
-  temp$scrap_tbl[[i]] <- d
-}
-
-# 4. count enrollments
-
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
-
-#should do a histogram of class caps...so many are 0
-hist(d$Class.Size)
-hist(d$Class.Size[d$Instructor!="Cancelled"])
-stem(d$Class.Size)
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% ggplot(aes(x=Class.Size)) + geom_histogram()+facet_wrap(~cancel)
-# Histograms of class sizes -----------------------------------------------
-
-
-
-
-
-#
-# 5. compare site vs calculated enrollment
-#
-sum(d$Enrolled)-site.enrolled.count
-
-}
 
 
 
