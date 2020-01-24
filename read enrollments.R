@@ -1,5 +1,5 @@
 library(tidyverse)
-
+library(microbenchmark)
 # Components of dataframe -------------------------------------------------
 
 # 1 select college , quarter and year navigate to that page
@@ -155,10 +155,17 @@ el$sendKeysToElement(list(key='enter'))
 
 temp <- main.df[sample(1:nrow(main.df),3),]
 temp[,2:5]
-for (i in 1:nrow(temp)){
+
+
+system.time(for (i in 1:nrow(temp)){
   temp$Date_Time_acc <- Sys.time()
   remote_driver$navigate(temp$URL.link[i])
   print(temp$URL.link[i])
+  
+  #insert system delay
+  
+  Sys.sleep(sample(0:2,1))
+  
   page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
 
   # below uses xpath to pull the site reported count
@@ -197,7 +204,7 @@ for (i in 1:nrow(temp)){
     
     temp$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
     
-}
+})
 
 temp[,c(7,11)]
 
