@@ -154,6 +154,7 @@ el$sendKeysToElement(list(key='enter'))
 
 
 temp <- main.df[sample(1:nrow(main.df),3),]
+temp[,2:5]
 for (i in 1:nrow(temp)){
   temp$Date_Time_acc <- Sys.time()
   remote_driver$navigate(temp$URL.link[i])
@@ -198,7 +199,7 @@ for (i in 1:nrow(temp)){
     
 }
 
-temp
+temp[,c(7,11)]
 
 # 3. for each URL, 
 #   3a. open page
@@ -229,7 +230,7 @@ temp
 
 remote_driver$close()
 
-# clean and update  ----------------------------------------------------------
+# clean and update non-clustered --------------------------------------------
 for (i in 1:nrow(temp)){
   #load("enroll_report.RData")
   d<- temp$scrap_tbl[i]#    enroll.report[[1]]
@@ -265,6 +266,7 @@ for (i in 1:nrow(temp)){
   d[col.names] <- lapply(d[col.names],factor)
   str(d)
   temp$scrap_tbl[[i]] <- d
+  temp$scrap_enrol[i] <- sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)
 }
 
 
