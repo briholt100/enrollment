@@ -53,7 +53,7 @@ qc[143,] <- "B903" #"Winter 20")
 
 # Create main dataframe ---------------------------------------------------
 
-main.df<- data.frame(matrix(ncol=11,nrow=3*nrow(qc)))
+main.df<- data.frame(matrix(ncol=12,nrow=3*nrow(qc)))
 colnames(main.df) <- c('Date_Time_acc',
                        'college',
                        'code',
@@ -63,6 +63,7 @@ colnames(main.df) <- c('Date_Time_acc',
                        'scrap_enrol',
                        'enrol_diff',
                        'site_clus_enrol',
+					   'scrap__clust_tbl',
                        'scrap_clus_enrol',
                        'clus_diff')
 
@@ -79,7 +80,7 @@ main.df <- main.df %>%
       substr(code,4,4)=="3"~paste0("Winter"),
       substr(code,4,4)=="4"~paste0("Spring")
     )
-  ) %>% select(Date_Time_acc:code,Season,URL.link:length(main.df))
+  ) %>% select(Date_Time_acc:code,Season,URL.link:clus_diff)
 
 
  main.df<- main.df %>%                              ##creates new 'yr' variable to be paired with season in URL
@@ -186,6 +187,14 @@ for (i in 1:nrow(temp)){
     page %>% html_nodes(.,xpath=xpath.from.src)->table.out
     
     temp$scrap_tbl[i]<- table.out %>% html_table(fill = T)
+	
+	
+# clustered table
+    
+    xpath.from.src <- "/html/body/form/div[3]/table[2]" #xpath for clusterd classes
+    page %>% html_nodes(.,xpath=xpath.from.src)->table.out
+    
+    temp$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
     
 }
 
@@ -220,75 +229,7 @@ temp
 
 remote_driver$close()
 
-# Load and Clean ----------------------------------------------------------
-
-#load("enroll_report.RData")
-d<- enroll.report[[1]]
-
-# Get and correct column names --------------------------------------------
-
-var.names <- d[1,]
-colnames(d) <- var.names
-
-colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
-
-# The following drops non-data rows
-d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
-head(d)
-
-d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
-head(d)
-str(d)
-
-# drop 'divider', var number 11
-d<- d[,-11]
-
-# convert variables to factors, int, numeric ------------------------------
-
-#num:  4,10:14
-d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
-
-#time: 6:7
-# d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
-
-# factor: 1:3,5,8:9,15:18
-col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
-d[col.names] <- lapply(d[col.names],factor)
-str(d)
-
-# 4. count enrollments
-
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
-
-#should do a histogram of class caps...so many are 0
-hist(d$Class.Size)
-hist(d$Class.Size[d$Instructor!="Cancelled"])
-stem(d$Class.Size)
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% ggplot(aes(x=Class.Size)) + geom_histogram()+facet_wrap(~cancel)
-# Histograms of class sizes -----------------------------------------------
-
-
-
-
-
-#
-# 5. compare site vs calculated enrollment
-#
-sum(d$Enrolled)-site.enrolled.count
-
-# 6. store data into following fields:
-#
-#   campus
-# site quarter
-# site year
-# site enrollment
-# scraped enrollment
-# difference between site and scraped enrollment
-
-
-
+# clean and update  ----------------------------------------------------------
 for (i in 1:nrow(temp)){
   #load("enroll_report.RData")
   d<- temp$scrap_tbl[i]#    enroll.report[[1]]
@@ -330,8 +271,39 @@ for (i in 1:nrow(temp)){
 # check for differences between site and tabulated enrollments ------------
 
 for (i in 1:nrow(temp)){
- print( sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)-temp$site_enrol[[i]])
+  print( sum(temp$scrap_tbl[[i]]$Enrolled,na.rm=T)-temp$site_enrol[[i]])
 }
+
+# 4. count enrollments
+
+
+d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
+
+#should do a histogram of class caps...so many are 0
+hist(d$Class.Size)
+hist(d$Class.Size[d$Instructor!="Cancelled"])
+stem(d$Class.Size)
+
+d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% ggplot(aes(x=Class.Size)) + geom_histogram()+facet_wrap(~cancel)
+# Histograms of class sizes -----------------------------------------------
+
+
+
+
+
+#
+# 5. compare site vs calculated enrollment
+#
+sum(d$Enrolled)-site.enrolled.count
+
+# 6. store data into following fields:
+#
+#   campus
+# site quarter
+# site year
+# site enrollment
+# scraped enrollment
+# difference between site and scraped enrollment
 
 
 
