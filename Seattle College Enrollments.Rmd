@@ -1,0 +1,60 @@
+---
+title: "Seattle College Enrollments"
+author: "Brian Holt"
+date: "1/26/2020"
+output: 
+  html_document:
+    TOC: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages
+
+```{r, packages and data,echo=T}
+load('main.df')
+library(tidyverse)
+library(lubridate)
+```
+
+The following drops Summers
+
+```{r quick processing and graphing of enrollments,include =T}
+main.df %>% select(college,code, Season,yr,scrap_enrol) %>% 
+  mutate(Date=
+           ifelse(grepl("A|B|9903|9904",code),
+                  paste0('20',yr),
+                  paste0('19',yr))) %>% 
+  mutate(Date=case_when(
+    Season=='Summer'~paste0(Date,'-','07','-','20'),
+    Season=='Fall'~paste0(Date,'-','10','-','20'),
+    Season=='Winter'~paste0(Date,'-','01','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20'),
+  )) %>% 
+  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
+  
+  ggplot(aes(x=Date,y=scrap_enrol,color=college))+geom_line()+
+  geom_vline(xintercept = as.numeric(ymd('2009-10-20')))
+  #geom_hline(yintercept = 10568)
+```
+
+This table looks at the highest enrollment (around 2009) and compares the relative drop amoung the colleges.
+```{r, drop from high, echo=F }
+main.df %>% select(college,code, Season,yr,scrap_enrol) %>% 
+  mutate(Date=
+           ifelse(grepl("A|B|9903|9904",code),
+                  paste0('20',yr),
+                  paste0('19',yr))) %>% 
+  mutate(Date=case_when(
+    Season=='Summer'~paste0(Date,'-','07','-','20'),
+    Season=='Fall'~paste0(Date,'-','10','-','20'),
+    Season=='Winter'~paste0(Date,'-','01','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20'),
+  )) %>% 
+  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% group_by(college) %>% 
+  summarise(max=max(scrap_enrol),recent_qrt=sum(scrap_enrol[code=='B903']),Percent_drop=( max-recent_qrt)/max)
+  
+  
+```
