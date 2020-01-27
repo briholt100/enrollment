@@ -2,13 +2,28 @@
 title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
-output: 
+output:
   html_document:
-    TOC: TRUE
+    df_print: paged
+  rmdformats::html_clean:
+    TOC: yes
+    highlight: kate
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, echo=FALSE, cache=FALSE}
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=FALSE,
+	             cache=TRUE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
 ```
 
 ## Packages
@@ -17,12 +32,13 @@ knitr::opts_chunk$set(echo = TRUE)
 load('main.df')
 library(tidyverse)
 library(lubridate)
+library(purrr)
 ```
 
 The following drops Summers
 
 ```{r quick processing and graphing of enrollments,include =T}
-main.df %>% select(college,code, Season,yr,scrap_enrol) %>% 
+main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
                   paste0('20',yr),
@@ -31,18 +47,19 @@ main.df %>% select(college,code, Season,yr,scrap_enrol) %>%
     Season=='Summer'~paste0(Date,'-','07','-','20'),
     Season=='Fall'~paste0(Date,'-','10','-','20'),
     Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20')
   )) %>% 
   mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
   
-  ggplot(aes(x=Date,y=scrap_enrol,color=college))+geom_line()+
-  geom_vline(xintercept = as.numeric(ymd('2009-10-20')))
+  ggplot(aes(x=Date,y=scrap_enrol,color=Season))+geom_line()+#geom_smooth(method="loess")+
+  #geom_vline(xintercept = as.numeric(ymd('2009-10-20')))+
+  facet_wrap(~college)
   #geom_hline(yintercept = 10568)
 ```
 
 This table looks at the highest enrollment (around 2009) and compares the relative drop amoung the colleges.
 ```{r, drop from high, echo=F }
-main.df %>% select(college,code, Season,yr,scrap_enrol) %>% 
+main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
                   paste0('20',yr),
@@ -51,10 +68,13 @@ main.df %>% select(college,code, Season,yr,scrap_enrol) %>%
     Season=='Summer'~paste0(Date,'-','07','-','20'),
     Season=='Fall'~paste0(Date,'-','10','-','20'),
     Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20'),
-  )) %>% 
+    Season=='Spring'~paste0(Date,'-','04','-','20')
+    )) %>% 
   mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% group_by(college) %>% 
-  summarise(max=max(scrap_enrol),recent_qrt=sum(scrap_enrol[code=='B903']),Percent_drop=( max-recent_qrt)/max)
+  summarise(max=max(scrap_enrol+site_clus_enrol),
+            recent_qrt= sum(scrap_enrol[code=='B902']+
+                              site_clus_enrol[code=='B902']),
+            Percent_drop=( round((max-recent_qrt)/max*100,1)))
   
   
 ```

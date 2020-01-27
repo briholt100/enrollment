@@ -290,6 +290,11 @@ head(main.df[,c(1:5,7,9:11,13:14)])
 
 # 4. count enrollments
 
+main.df$scrap_tbl[[1]] %>% 
+  mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% 
+  group_by(cancel) %>% 
+  summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
+
 d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
 
 #should do a histogram of class caps...so many are 0
