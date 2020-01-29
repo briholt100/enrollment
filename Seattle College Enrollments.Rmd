@@ -128,7 +128,7 @@ https://www.google.com/search?client=firefox-b-1-d&q=adding+data.frames+to+list+
 
 
 
-
+```{r stitching it together, include =T}
 rows <- 1:nrow(main.df)
 for (i in 1:nrow(main.df)){
 rows[i] <- ( nrow(main.df[,"scrap_tbl"][[i]]))
@@ -138,12 +138,14 @@ main <- matrix(ncol=1,nrow=sum(rows))
 main <- data.frame(main)
 datalist = list()
 for (i in 1:length(rows)){
-datalist[[i]]<- cbind(college=rep_len(main.df$college[i],length.out = rows[i]),main.df$scrap_tbl[[i]])
+prelim.df <- cbind(rep_len(main.df[,2:5][i],length.out = rows[i]))
+  datalist[[i]]<- cbind(prelim.df,main.df$scrap_tbl[[i]])
 }
 
 test<- (do.call(rbind, datalist))
 
 nrow(test)
+```
 test[grep('^bholt',test$Instructor,ignore.case=T),] %>% summarise(mean(Enrolled))
   
   
