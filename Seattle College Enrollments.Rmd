@@ -3,12 +3,14 @@ title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
   rmdformats::html_clean:
     TOC: yes
     highlight: kate
 ---
+##A small project tracking enrollments
 
 ```{r setup, echo=FALSE, cache=FALSE}
 library(knitr)
@@ -26,19 +28,16 @@ opts_chunk$set(echo=FALSE,
 opts_knit$set(width=75)
 ```
 
-## Packages
-
-```{r, packages and data,echo=T}
+```{r, packages and data,echo=F}
 load('main.df')
 library(tidyverse)
 library(lubridate)
 library(purrr)
 ```
 
+##Some Data since 1985
 
-The following drops Summers
-
-```{r quick processing and graphing of enrollments,include =T}
+```{r quick processing and graphing of enrollments,include =F}
 main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
@@ -50,7 +49,7 @@ main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>%
     Season=='Winter'~paste0(Date,'-','01','-','20'),
     Season=='Spring'~paste0(Date,'-','04','-','20')
   )) %>% 
-  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
+  mutate(Date = ymd(Date)) %>% #filter(Season!="Summer") %>% 
   
   ggplot(aes(x=Date,y=scrap_enrol,color=Season))+geom_line()+#geom_smooth(method="loess")+
   #geom_vline(xintercept = as.numeric(ymd('2009-10-20')))+
@@ -58,7 +57,14 @@ main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>%
   #geom_hline(yintercept = 10568)
 ```
 
-This table looks at the highest enrollment (around 2009) and compares the relative drop amoung the colleges.
+This table looks at the highest enrollment (around 2009) and compares the percentage drop among the colleges.
+
+062 = Central;
+
+063 = North;
+
+064 = South
+
 ```{r, drop from high, echo=F }
 main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
   mutate(Date=
@@ -76,11 +82,7 @@ main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>%
             recent_qrt= sum(scrap_enrol[code=='B902']+
                               site_clus_enrol[code=='B902']),
             Percent_drop=( round((max-recent_qrt)/max*100,1)))
-  
-  
 ```
-
-
 
 ```{r stitching it together, include =T}
 datalist <- list()
@@ -93,8 +95,6 @@ df <- do.call(rbind,datalist)
 
 ```
 
-Change college from numbers
-
 ```{r change from factor to character to change back, include =T}
 
 df<- df %>% mutate(college=as.character(college)) %>% 
@@ -102,9 +102,7 @@ df<- df %>% mutate(college=as.character(college)) %>%
 
 ```
 
-
-
-```{r calc enrolled by college over time, include=T}
+```{r calc enrolled by college over time, include=T,fig.dim=c(6,4)}
 df %>% select(college,code,Season,yr,Enrolled) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
@@ -117,23 +115,20 @@ df %>% select(college,code,Season,yr,Enrolled) %>%
     Season=='Spring'~paste0(Date,'-','04','-','20')
     )) %>% 
   mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
-  group_by(college,Date,Season) %>% summarise(sum=sum(Enrolled)) %>% 
-  ggplot(aes(x=Date,y=sum,color=Season))+geom_line()+facet_wrap(~college)
+  group_by(college,Date,Season) %>% summarise(Total_Enrol=sum(Enrolled)) %>% 
+  ggplot(aes(x=Date,y=Total_Enrol,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total Enrollment over time")
 
 ```
   
 ```{r, prove that differences bw enrollof scrap vs site, comments=T}
   
-##at some point would be worth confirming that the scrapped data looks like the calc'd data
+##at some point would be worth confirming that the scrapped data looks like the calc'd data 
+
+#summer 04 the 'new' AU codes went into effect
 
 ```  
   
-  
-  #summer 04 the 'new' AU codes went into effect
-  
-  
-  
-```{r calc enrolled vs State FTE by Season codes over time, include=T}
+```{r calc enrolled vs State FTE by Season codes over time, include=T,fig.dim=c(6,4)}
 df %>% select(college,code,Season,yr,Enrolled,State.FTES) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
@@ -147,7 +142,26 @@ df %>% select(college,code,Season,yr,Enrolled,State.FTES) %>%
     )) %>% 
   mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
   group_by(college,Date,Season) %>% summarise(Enrollment_Total=sum(Enrolled),State_FTE_tot=sum(State.FTES)) %>% 
-  ggplot(aes(x=Date,y=Enrollment_Total,color=Season))+geom_line()+geom_line(aes(x=Date,y=State_FTE_tot))+facet_wrap(~college)+title("Total Enrollment stacked above Total State FTE's")
+  ggplot(aes(x=Date,y=State_FTE_tot,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total State FTE's")
 #+theme(legend.position = "none")
 
 ```
+
+##Questions?
+
+Here is the data I have since 1985, what questions might you want answers to?
+
+`r colnames(df)[-22]`
+
+
+###Caveats:
+
+**In 2004, the AU (administrative unit) codes changed, but this is how we'd track Division and program data.  I need to rig up some SQL to join this data to some titles from an excel table;
+
+**The convention for tracking instructor names changes overtime making it hard to just pull out one person.  Ideally there would be a primary key for instructor, but that isn't trivial to create and using Employment ID is risky.
+
+** I need to learn what the Pro and Org budgets mean. 
+
+##What questions might you like?
+
+How has nursing impacted FTE's since they moved to District? 
