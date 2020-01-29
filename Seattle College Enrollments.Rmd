@@ -124,3 +124,27 @@ To merge (join) a list of data frames, you can see these answers. Often, the ide
 https://stackoverflow.com/questions/17499013/how-do-i-make-a-list-of-data-frames
 
 https://www.google.com/search?client=firefox-b-1-d&q=adding+data.frames+to+list+rstats
+
+
+
+
+
+rows <- 1:nrow(main.df)
+for (i in 1:nrow(main.df)){
+rows[i] <- ( nrow(main.df[,"scrap_tbl"][[i]]))
+}
+
+main <- matrix(ncol=1,nrow=sum(rows))
+main <- data.frame(main)
+datalist = list()
+for (i in 1:length(rows)){
+datalist[[i]]<- cbind(college=rep_len(main.df$college[i],length.out = rows[i]),main.df$scrap_tbl[[i]])
+}
+
+test<- (do.call(rbind, datalist))
+
+nrow(test)
+test[grep('^bholt',test$Instructor,ignore.case=T),] %>% summarise(mean(Enrolled))
+  
+  
+  
