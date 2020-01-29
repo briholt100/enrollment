@@ -35,6 +35,7 @@ library(lubridate)
 library(purrr)
 ```
 
+
 The following drops Summers
 
 ```{r quick processing and graphing of enrollments,include =T}
@@ -81,72 +82,72 @@ main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>%
 
 
 
-library(dplyr)
-library(purrr)
-library(repurrrsive)
-
-(nms <- map_chr(got_chars, "name"))
-map_dfr(got_chars, `[`, c("name", "gender", "culture", "born"))
-map(main.df$scrap_tbl, `[`,c("Enrolled","Class.Size"))
-
-
-extract_data<- function(x,y) {
-cbind(main.df$college[1],main.df$scrap_tbl[[1]]["Waitlist"])
-}
-df<- apply(main.df,1,extract_data)
-tail(df)
-
-
-df<- cbind(main.df$college,lapply(main.df$scrap_tbl, `[`, c('Enrolled', 'Waitlist')))
-
-do.call
-
-
-Combining a list of data frames into a single data frame
-
-A common task is combining a list of data frames into one big data frame. If you want to stack them on top of each other, you would use rbind for a pair of them, but for a list of data frames here are three good choices:
-
-# base option - slower but not extra dependencies
-big_data = do.call(what = rbind, args = df_list)
-
-# data table and dplyr have nice functions for this that
-#  - are much faster
-#  - add id columns to identify the source
-#  - fill in missing values if some data frames have more columns than others
-# see their help pages for details
-big_data = data.table::rbindlist(df_list)
-big_data = dplyr::bind_rows(df_list)
-
-(Similarly using cbind or dplyr::bind_cols for columns.)
-
-To merge (join) a list of data frames, you can see these answers. Often, the idea is to use Reduce with merge (or some other joining function) to get them together.
-
-https://stackoverflow.com/questions/17499013/how-do-i-make-a-list-of-data-frames
-
-https://www.google.com/search?client=firefox-b-1-d&q=adding+data.frames+to+list+rstats
-
-
-
-
 ```{r stitching it together, include =T}
-rows <- 1:nrow(main.df)
+datalist <- list()
 for (i in 1:nrow(main.df)){
-rows[i] <- ( nrow(main.df[,"scrap_tbl"][[i]]))
-}
+  row.count <- nrow(main.df$scrap_tbl[[i]])
+  datalist[[i]] <- main.df$scrap_tbl[[i]]
+  datalist[[i]] <- (cbind(main.df[i,2:5],datalist[[i]]))
+  }
+df <- do.call(rbind,datalist)
 
-main <- matrix(ncol=1,nrow=sum(rows))
-main <- data.frame(main)
-datalist = list()
-for (i in 1:length(rows)){
-prelim.df <- cbind(rep_len(main.df[,2:5][i],length.out = rows[i]))
-  datalist[[i]]<- cbind(prelim.df,main.df$scrap_tbl[[i]])
-}
-
-test<- (do.call(rbind, datalist))
-
-nrow(test)
 ```
-test[grep('^bholt',test$Instructor,ignore.case=T),] %>% summarise(mean(Enrolled))
+
+Change college from numbers
+
+```{r change from factor to character to change back, include =T}
+
+df<- df %>% mutate(college=as.character(college)) %>% 
+  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
+
+```
+
+
+
+```{r calc enrolled by college over time, include=T}
+df %>% select(college,code,Season,yr,Enrolled) %>% 
+  mutate(Date=
+           ifelse(grepl("A|B|9903|9904",code),
+                  paste0('20',yr),
+                  paste0('19',yr))) %>% 
+  mutate(Date=case_when(
+    Season=='Summer'~paste0(Date,'-','07','-','20'),
+    Season=='Fall'~paste0(Date,'-','10','-','20'),
+    Season=='Winter'~paste0(Date,'-','01','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20')
+    )) %>% 
+  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
+  group_by(college,Date,Season) %>% summarise(sum=sum(Enrolled)) %>% 
+  ggplot(aes(x=Date,y=sum,color=Season))+geom_line()+facet_wrap(~college)
+
+```
+  
+```{r, prove that differences bw enrollof scrap vs site, comments=T}
+  
+##at some point would be worth confirming that the scrapped data looks like the calc'd data
+
+```  
+  
+  
+  #summer 04 the 'new' AU codes went into effect
   
   
   
+```{r calc enrolled vs State FTE by Season codes over time, include=T}
+df %>% select(college,code,Season,yr,Enrolled,State.FTES) %>% 
+  mutate(Date=
+           ifelse(grepl("A|B|9903|9904",code),
+                  paste0('20',yr),
+                  paste0('19',yr))) %>% 
+  mutate(Date=case_when(
+    Season=='Summer'~paste0(Date,'-','07','-','20'),
+    Season=='Fall'~paste0(Date,'-','10','-','20'),
+    Season=='Winter'~paste0(Date,'-','01','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20')
+    )) %>% 
+  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
+  group_by(college,Date,Season) %>% summarise(Enrollment_Total=sum(Enrolled),State_FTE_tot=sum(State.FTES)) %>% 
+  ggplot(aes(x=Date,y=Enrollment_Total,color=Season))+geom_line()+geom_line(aes(x=Date,y=State_FTE_tot))+facet_wrap(~college)+title("Total Enrollment stacked above Total State FTE's")
+#+theme(legend.position = "none")
+
+```
