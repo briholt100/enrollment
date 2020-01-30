@@ -263,7 +263,7 @@ for (i in 1:nrow(main.df)){
 
   d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x)) #removes heading space; converts to character
   head(d)
-  str(d)
+ # str(d)
   
   # drop 'divider', var number 11
   d<- d[,-11]
@@ -316,114 +316,34 @@ for (i in 1:nrow(main.df)){
   # factor: 1:3,5,8:9,15:18
   col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
   d[col.names] <- lapply(d[col.names],factor)
-  str(d)
-  main.df$scrap_tbl[[i]] <- d
-  main.df$scrap_enrol[i] <- sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)
+  #str(d)
+  main.df$scrap__clust_tbl[[i]] <- d
+  main.df$scrap_clus_enrol <- sum(main.df$scrap__clust_tbl[[i]]$Enrolled,na.rm=T)
 }
 
 
-# check for differences between site and tabulated enrollments ------------
-
+# Stitching main df it together
+datalist <- list()
 for (i in 1:nrow(main.df)){
-  print( sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)-main.df$site_enrol[[i]])
+  row.count <- nrow(main.df$scrap_tbl[[i]])
+ datalist[[i]] <- main.df$scrap_tbl[[i]]
+datalist[[i]] <- (cbind(main.df[i,2:5],datalist[[i]]))
 }
+df <- do.call(rbind,datalist)
+df<- df %>% 
+  mutate(cancel=ifelse(grepl("cancel",Instructor,ignore.case=T),1,0)) 
 
-head(main.df[,c(1:5,7,9:11,13:14)])
-
-# 4. count enrollments
-
-main.df$scrap_tbl[[1]] %>% 
-  mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% 
-  group_by(cancel) %>% 
-  summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
-
-#should do a histogram of class caps...so many are 0
-hist(d$Class.Size)
-hist(d$Class.Size[d$Instructor!="Cancelled"])
-stem(d$Class.Size)
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% ggplot(aes(x=Class.Size)) + geom_histogram()+facet_wrap(~cancel)
-# Histograms of class sizes -----------------------------------------------
+tapply(df$cancel,df$college,sum)
 
 
-#
-# 5. compare site vs calculated enrollment
-#
-sum(d$Enrolled)-site.enrolled.count
-
-# 6. store data into following fields:
-#
-#   campus
-# site quarter
-# site year
-# site enrollment
-# scraped enrollment
-# difference between site and scraped enrollment
-
-
-# Clean ----------------------------------------------------------
+# Stitching main clustered df it together
+datalist.clus <- list()
 for (i in 1:nrow(main.df)){
-  d <- main.df$scrap_tbl[[i]]
-  
-  # Get and correct column names --------------------------------------------
-  
-  var.names <- d[1,]
-  colnames(d) <- var.names
-  
-  colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
-  
-  # The following drops non-data rows
-  d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
-  head(d)
-  
-  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
-  head(d)
-  str(d)
-  
-  # drop 'divider', var number 11
-  d<- d[,-11]
-  
-  # convert variables to factors, int, numeric ------------------------------
-  
-  #num:  4,10:14
-  d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
-  
-  #time: 6:7
-  # d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
-  
-  # factor: 1:3,5,8:9,15:18
-  col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
-  d[col.names] <- lapply(d[col.names],factor)
-  str(d)
-  main.df$scrap_tbl[[i]] <- d
+  row.count <- nrow(main.df$scrap__clust_tbl[[i]])
+  datalist.clus[[i]] <- main.df$scrap__clust_tbl[[i]]
+  datalist.clus[[i]] <- (cbind(main.df[i,2:5],datalist.clus[[i]]))
 }
-
-
-# 4. count enrollments
-
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% summarize(sumEnrol=sum(Enrolled),sumFTE=sum(Total.FTES),sumStateFte=sum(State.FTES),meanEnr=sumEnrol/n())
-
-#should do a histogram of class caps...so many are 0
-hist(d$Class.Size)
-hist(d$Class.Size[d$Instructor!="Cancelled"])
-stem(d$Class.Size)
-
-d %>% mutate(cancel=ifelse(Instructor == "Cancelled",1,0)) %>% group_by(cancel) %>% ggplot(aes(x=Class.Size)) + geom_histogram()+facet_wrap(~cancel)
-# Histograms of class sizes -----------------------------------------------
-
-
-
-
-
-#
-# 5. compare site vs calculated enrollment
-#
-sum(d$Enrolled)-site.enrolled.count
-
-}
-
-
-
+df.clus <- do.call(rbind,datalist.clus)
+df.clus<- df.clus %>% 
+  mutate(cancel=ifelse(grepl("cancel",Instructor,ignore.case=T),1,0)) 
+tapply(df.clus$cancel,df.clus$college,sum)

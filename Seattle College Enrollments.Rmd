@@ -3,9 +3,9 @@ title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
+  pdf_document: default
   rmdformats::html_clean:
     TOC: yes
     highlight: kate
@@ -29,7 +29,7 @@ opts_knit$set(width=75)
 ```
 
 ```{r, packages and data,echo=F}
-load(main.df)
+load('main.df.Rdata')
 library(tidyverse)
 library(lubridate)
 library(purrr)
@@ -84,16 +84,20 @@ main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>%
             Percent_drop=( round((max-recent_qrt)/max*100,1)))
 ```
 
-```{r stitching it together, include =T}
-datalist <- list()
-for (i in 1:nrow(main.df)){
-  row.count <- nrow(main.df$scrap_tbl[[i]])
-  datalist[[i]] <- main.df$scrap_tbl[[i]]
-  datalist[[i]] <- (cbind(main.df[i,2:5],datalist[[i]]))
-  }
-df <- do.call(rbind,datalist)
 
+
+
+##identify cancelled
+
+```{r}
+
+df %>% 
+  group_by(cancel,college,Season) %>% 
+  summarize(sumEnrol=sum(Enrolled),
+                        meanEnr=sumEnrol/n())
 ```
+
+
 
 ```{r change from factor to character to change back, include =T}
 
@@ -103,7 +107,7 @@ df<- df %>% mutate(college=as.character(college)) %>%
 ```
 
 ```{r calc enrolled by college over time, include=T,fig.dim=c(6,4)}
-df %>% select(college,code,Season,yr,Enrolled) %>% 
+df %>% select(college,code,Season,yr,Enrolled,cancel) %>% 
   mutate(Date=
            ifelse(grepl("A|B|9903|9904",code),
                   paste0('20',yr),
@@ -114,9 +118,9 @@ df %>% select(college,code,Season,yr,Enrolled) %>%
     Season=='Winter'~paste0(Date,'-','01','-','20'),
     Season=='Spring'~paste0(Date,'-','04','-','20')
     )) %>% 
-  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
-  group_by(college,Date,Season) %>% summarise(Total_Enrol=sum(Enrolled)) %>% 
-  ggplot(aes(x=Date,y=Total_Enrol,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total Enrollment over time")
+  mutate(Date = ymd(Date)) %>% filter(Season!="Summer" ) %>% 
+  group_by(college,Date,Season,cancel) %>% summarise(Total_cancel=sum(cancel)) %>% 
+  ggplot(aes(x=Date,y=Total_cancel,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total Enrollment over time")
 
 ```
   
