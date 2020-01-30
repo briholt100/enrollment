@@ -206,7 +206,7 @@ for (i in 1:nrow(main.df)){
     
     print(paste("we are on iteration ",i))
 }
-save(main.df,file = "main.df")
+save(main.df,file = "main.df.Rdata")
 
 #temp[,c(7,11)]
 

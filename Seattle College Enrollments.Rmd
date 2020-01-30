@@ -29,7 +29,7 @@ opts_knit$set(width=75)
 ```
 
 ```{r, packages and data,echo=F}
-load('main.df')
+load(main.df)
 library(tidyverse)
 library(lubridate)
 library(purrr)
