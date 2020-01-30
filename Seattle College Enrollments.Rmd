@@ -10,6 +10,18 @@ output:
     TOC: yes
     highlight: kate
 ---
+
+#Key things to be done:
+
+1. merge cluster df.clus to main df--will require "empty" column in df to be renamed? 
+2. add canceled info to this dataframe
+3. process the date and day data once and save it to main.df.b.Rdata
+4. confirm that the data matches a few of the website. 
+
+goal is to have 1 data frame of both clustered and non with normal dates, days, and cancelled.
+
+
+
 ##A small project tracking enrollments
 
 ```{r setup, echo=FALSE, cache=FALSE}
