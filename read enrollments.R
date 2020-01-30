@@ -250,13 +250,18 @@ for (i in 1:nrow(main.df)){
   var.names <- d[1,]
   colnames(d) <- var.names
   
-  colnames(d) <- c("Item","Course ID","Title","CR","Days.meet","Start.Time","End.Time","Room","Instructor","Enrolled","divider","Class.Size",'Waitlist', "Total.FTES","State.FTES","Pro.Budget","Org.Budget","AU.Budget","empty")
+  colnames(d) <- c("Item","Course ID","Title",
+                   "CR","Days.meet","Start.Time",
+                   "End.Time","Room","Instructor",
+                   "Enrolled","divider","Class.Size",
+                   'Waitlist', "Total.FTES","State.FTES",
+                   "Pro.Budget","Org.Budget","AU.Budget","empty")
   
   # The following drops non-data rows
   d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
   head(d)
 
-  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
+  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x)) #removes heading space; converts to character
   head(d)
   str(d)
   
@@ -271,6 +276,43 @@ for (i in 1:nrow(main.df)){
   #time: 6:7
   # d[,c(6:7)] <- apply(d[,c(6,7)],2,as.Date)
   
+  # factor: 1:3,5,8:9,15:18
+  col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
+  d[col.names] <- lapply(d[col.names],factor)
+  str(d)
+  main.df$scrap_tbl[[i]] <- d
+  main.df$scrap_enrol[i] <- sum(main.df$scrap_tbl[[i]]$Enrolled,na.rm=T)
+}
+
+# clean and update clustered --------------------------------------------
+for (i in 1:nrow(main.df)){
+  d<- main.df$scrap__clust_tbl[i]#    enroll.report[[1]]
+  d <- d[[1]]
+  head(d)
+  var.names <- d[1,]
+  colnames(d) <- var.names
+
+  colnames(d) <- c("Item","Course ID","Title","CR",
+                   "Days.meet","Start.Time","End.Time",
+                   "Room","Instructor","Enrolled",
+                   "divider","Class.Size",'Waitlist', 
+                   "Total.FTES","State.FTES","Pro.Budget",
+                   "Org.Budget","AU.Budget","Cluster")
+  # The following drops non-data rows
+  d <- d[grep('[^item]',d$Item,ignore.case=T,value=F),]
+  head(d)
+
+  d[,c(2,3,5,6,8,9)] <- apply(d[,c(2,3,5,6,8,9)],2,function(x) gsub(" {2,}"," ",x))
+  head(d)
+  str(d)
+  # drop 'divider', var number 11
+  d<- d[,-11]
+
+  # convert variables to factors, int, numeric ------------------------------
+
+  #num:  4,10:14
+  d[,c(4,10:14)] <- apply(d[,c(4,10:14)],2,as.numeric)
+
   # factor: 1:3,5,8:9,15:18
   col.names <- colnames(d[,c(1:3,5,8:9,15:18)])
   d[col.names] <- lapply(d[col.names],factor)
