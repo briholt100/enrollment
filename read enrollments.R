@@ -1,4 +1,5 @@
 library(tidyverse)
+library(lubridate)
 library(microbenchmark)
 # Components of dataframe -------------------------------------------------
 
@@ -44,7 +45,7 @@ qc<- qc[order(qc$code),]
 qc<- as.data.frame(qc)
 colnames(qc) <- "code"
 
-# Adding to the corpus ----------------------------------------------------
+# Adding new quarters to the corpus ----------------------------------------------------
 
 qc[141,] <- "B901" # "Summer 19"
 qc[142,] <- "B902" #"Fall 19")
@@ -117,11 +118,11 @@ main.df<- main.df %>%
 
 # Do the crawl ------------------------------------------------------------
 
-# pseudo code
+# pseudo code ------------------------------------------------------------
 
 # 1. start selenium and open browser
 
-#Using Rselenium
+# Using Rselenium ------------------------------------------------------------
 library(RSelenium)
 library(rvest)
 
@@ -330,13 +331,12 @@ for (i in 1:nrow(main.df)){
 datalist[[i]] <- (cbind(main.df[i,2:5],datalist[[i]]))
 }
 df <- do.call(rbind,datalist)
-df<- df %>% 
-  mutate(cancel=ifelse(grepl("cancel",Instructor,ignore.case=T),1,0)) 
 
-tapply(df$cancel,df$college,sum)
-
-
-# Stitching main clustered df it together
+# rename Empty column to 'Cluster'
+df<- df[,-22]
+df$Cluster <- NA
+str(df)
+# Stitching main clustered df it together  ---------------------------
 datalist.clus <- list()
 for (i in 1:nrow(main.df)){
   row.count <- nrow(main.df$scrap__clust_tbl[[i]])
@@ -344,6 +344,32 @@ for (i in 1:nrow(main.df)){
   datalist.clus[[i]] <- (cbind(main.df[i,2:5],datalist.clus[[i]]))
 }
 df.clus <- do.call(rbind,datalist.clus)
-df.clus<- df.clus %>% 
+
+str(df.clus)
+
+
+# combining two data frames cluster and non -------------------------------
+
+df.tot <- rbind(df,df.clus)
+# adding cancel variable, checking differences ----------------------------
+
+df.tot<- df.tot %>% 
   mutate(cancel=ifelse(grepl("cancel",Instructor,ignore.case=T),1,0)) 
-tapply(df.clus$cancel,df.clus$college,sum)
+
+
+# create true 'Date' variable ---------------------------------------------
+
+df.tot<- df.tot %>%
+  mutate(Date=
+           ifelse(grepl("A|B|9903|9904",code),
+                  paste0('20',yr),
+                  paste0('19',yr))) %>% 
+  mutate(Date=case_when(
+    Season=='Summer'~paste0(Date,'-','07','-','20'),
+    Season=='Fall'~paste0(Date,'-','10','-','20'),
+    Season=='Winter'~paste0(Date,'-','01','-','20'),
+    Season=='Spring'~paste0(Date,'-','04','-','20')
+  )) %>% mutate(Date = ymd(Date))
+
+save(df.tot,file='seattle_col_enrol_thru_Win_2020.RData')
+  

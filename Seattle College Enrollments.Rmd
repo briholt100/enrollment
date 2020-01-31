@@ -3,24 +3,30 @@ title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
   rmdformats::html_clean:
     TOC: yes
     highlight: kate
 ---
-
+```{r, packages and data,echo=F}
+library(tidyverse)
+library(lubridate)
+library(dplyr)
+```
 #Key things to be done:
 
-1. merge cluster df.clus to main df--will require "empty" column in df to be renamed? 
-2. add canceled info to this dataframe
-3. process the date and day data once and save it to main.df.b.Rdata
-4. confirm that the data matches a few of the website. 
+1.confirm that the data matches a few of the website. 
+```{r load data, include=TRUE}
+load('seattle_col_enrol_thru_Win_2020.RData')
+df <- df.tot
+rm(df.tot)
 
-goal is to have 1 data frame of both clustered and non with normal dates, days, and cancelled.
+df<- df %>% mutate(college=as.character(college)) %>% 
+  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
 
-
+```
 
 ##A small project tracking enrollments
 
@@ -40,99 +46,37 @@ opts_chunk$set(echo=FALSE,
 opts_knit$set(width=75)
 ```
 
-```{r, packages and data,echo=F}
-load('main.df.Rdata')
-library(tidyverse)
-library(lubridate)
-library(purrr)
-```
 
 ##Some Data since 1985
 
-```{r quick processing and graphing of enrollments,include =F}
-main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
-  mutate(Date=
-           ifelse(grepl("A|B|9903|9904",code),
-                  paste0('20',yr),
-                  paste0('19',yr))) %>% 
-  mutate(Date=case_when(
-    Season=='Summer'~paste0(Date,'-','07','-','20'),
-    Season=='Fall'~paste0(Date,'-','10','-','20'),
-    Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20')
-  )) %>% 
-  mutate(Date = ymd(Date)) %>% #filter(Season!="Summer") %>% 
-  
-  ggplot(aes(x=Date,y=scrap_enrol,color=Season))+geom_line()+#geom_smooth(method="loess")+
-  #geom_vline(xintercept = as.numeric(ymd('2009-10-20')))+
+```{r quick processing and graphing of enrollments,include =T}
+df %>% filter(Season!='Summer',cancel==0) %>% select(Date,Enrolled,Season,college) %>% group_by(college,Date,Season) %>% 
+  summarise(Quarter_enrollment_total=sum(Enrolled)) %>% 
+  ggplot(aes(x=Date,y=Quarter_enrollment_total,color=Season))+geom_line()+#geom_smooth(method="loess")+
   facet_wrap(~college)
-  #geom_hline(yintercept = 10568)
 ```
 
 This table looks at the highest enrollment (around 2009) and compares the percentage drop among the colleges.
 
-062 = Central;
-
-063 = North;
-
-064 = South
-
 ```{r, drop from high, echo=F }
-main.df %>% select(college,code, Season,yr,scrap_enrol,site_clus_enrol) %>% 
-  mutate(Date=
-           ifelse(grepl("A|B|9903|9904",code),
-                  paste0('20',yr),
-                  paste0('19',yr))) %>% 
-  mutate(Date=case_when(
-    Season=='Summer'~paste0(Date,'-','07','-','20'),
-    Season=='Fall'~paste0(Date,'-','10','-','20'),
-    Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20')
-    )) %>% 
-  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% group_by(college) %>% 
-  summarise(max=max(scrap_enrol+site_clus_enrol),
-            recent_qrt= sum(scrap_enrol[code=='B902']+
-                              site_clus_enrol[code=='B902']),
-            Percent_drop=( round((max-recent_qrt)/max*100,1)))
+df %>% select(Date,college,code, Season,yr,Enrolled,Cluster) %>% 
+  mutate(Cluster=ifelse(is.na(Cluster)==T,'not clus','clus')) %>% group_by(college,Cluster,Date) %>% 
+  summarise(max=max(sum(Enrolled))
+            #recent_qrt= sum(Enrolled[code=='B902'])
+            #Percent_drop=( round((max-recent_qrt)/max*100,1))
+            ) %>% group_by(college) %>% summarise(max=max(max))
+
+
 ```
 
 
 
-
-##identify cancelled
-
-```{r}
-
-df %>% 
-  group_by(cancel,college,Season) %>% 
-  summarize(sumEnrol=sum(Enrolled),
-                        meanEnr=sumEnrol/n())
-```
-
-
-
-```{r change from factor to character to change back, include =T}
-
-df<- df %>% mutate(college=as.character(college)) %>% 
-  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
-
-```
 
 ```{r calc enrolled by college over time, include=T,fig.dim=c(6,4)}
-df %>% select(college,code,Season,yr,Enrolled,cancel) %>% 
-  mutate(Date=
-           ifelse(grepl("A|B|9903|9904",code),
-                  paste0('20',yr),
-                  paste0('19',yr))) %>% 
-  mutate(Date=case_when(
-    Season=='Summer'~paste0(Date,'-','07','-','20'),
-    Season=='Fall'~paste0(Date,'-','10','-','20'),
-    Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20')
-    )) %>% 
-  mutate(Date = ymd(Date)) %>% filter(Season!="Summer" ) %>% 
-  group_by(college,Date,Season,cancel) %>% summarise(Total_cancel=sum(cancel)) %>% 
-  ggplot(aes(x=Date,y=Total_cancel,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total Enrollment over time")
+df %>% select(college,Date,code,Season,yr,Enrolled,cancel) %>% 
+ filter(Season!="Summer", as.integer(yr)>00 & as.integer(yr)<30 ) %>% 
+  group_by(college,Date,Season) %>% summarise(Total_enrolled=sum(Enrolled)) %>% 
+  ggplot(aes(x=Date,y=Total_enrolled,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total Enrollment over time")
 
 ```
   
@@ -144,21 +88,11 @@ df %>% select(college,code,Season,yr,Enrolled,cancel) %>%
 
 ```  
   
-```{r calc enrolled vs State FTE by Season codes over time, include=T,fig.dim=c(6,4)}
-df %>% select(college,code,Season,yr,Enrolled,State.FTES) %>% 
-  mutate(Date=
-           ifelse(grepl("A|B|9903|9904",code),
-                  paste0('20',yr),
-                  paste0('19',yr))) %>% 
-  mutate(Date=case_when(
-    Season=='Summer'~paste0(Date,'-','07','-','20'),
-    Season=='Fall'~paste0(Date,'-','10','-','20'),
-    Season=='Winter'~paste0(Date,'-','01','-','20'),
-    Season=='Spring'~paste0(Date,'-','04','-','20')
-    )) %>% 
-  mutate(Date = ymd(Date)) %>% filter(Season!="Summer") %>% 
-  group_by(college,Date,Season) %>% summarise(Enrollment_Total=sum(Enrolled),State_FTE_tot=sum(State.FTES)) %>% 
-  ggplot(aes(x=Date,y=State_FTE_tot,color=Season))+geom_line()+facet_wrap(~college)+ggtitle("Total State FTE's")
+```{r calc enrolled vs State FTE over time, include=T,fig.dim=c(6,4)}
+df %>% select(college,Date,code,yr,Enrolled,State.FTES,Season) %>% 
+    filter(Season!="Summer", as.integer(yr)>00 & as.integer(yr)<30 ) %>% group_by(college,Date) %>% 
+  summarise(State_FTE_tot=sum(State.FTES)) %>% 
+  ggplot(aes(x=Date,y=State_FTE_tot))+geom_line()+facet_grid(~college)+ggtitle("Total State FTE's")+geom_smooth()
 #+theme(legend.position = "none")
 
 ```
