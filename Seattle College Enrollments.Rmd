@@ -3,12 +3,12 @@ title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
 output:
-  pdf_document: default
-  html_document:
-    df_print: paged
   rmdformats::html_clean:
     TOC: yes
     highlight: kate
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 ```{r, packages and data,echo=F}
 library(tidyverse)
@@ -21,7 +21,7 @@ library(dplyr)
 ```{r load data, include=TRUE}
 load('seattle_col_enrol_thru_Win_2020.RData')
 df <- df.tot
-rm(df.tot)
+#rm(df.tot)
 
 df<- df %>% mutate(college=as.character(college)) %>% 
   mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
@@ -115,3 +115,13 @@ Here is the data I have since 1985, what questions might you want answers to?
 ##What questions might you like?
 
 How has nursing impacted FTE's since they moved to District? 
+
+
+##Fill Ratio
+
+After dropping classes where class size is equal to zero (about 52,300 of them, as opposed to 282,000 kept), and then dropping Summer classes, here is a graph showing the ratio of Enrolled classes to their class size, averaged for the year, displayed by Season, College, and year.
+
+```{r, enrolled to class size ,include=T}
+df %>% select(college,code,Season,yr,Date,Enrolled,Class.Size) %>% mutate(ratio=Enrolled/Class.Size,Date=year(Date)) %>% filter(ratio!=Inf,Season!="Summer") %>% group_by(college,Season,Date) %>% summarise(mean_ratio=mean(ratio)) %>% ggplot(aes(x=Date,y=mean_ratio,color=Season)) +geom_line()+facet_grid(~college)+ggtitle("")
+
+```
