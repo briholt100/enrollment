@@ -1,4 +1,5 @@
 library(tidyverse)
+library(dplyr)
 library(lubridate)
 library(microbenchmark)
 # Components of dataframe -------------------------------------------------
@@ -373,3 +374,83 @@ df.tot<- df.tot %>%
 
 save(df.tot,file='seattle_col_enrol_thru_Win_2020.RData')
   
+
+
+# Fix South's cancelling labeling. ----------------------------------------
+
+load('main.df.b.RData')
+South_link_list <- main.df %>% filter(college=='064') %>% select(URL.link) 
+
+South_canceled_main.df <- main.df[0,c(1:5,8,11)]
+
+
+
+el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]')
+el$highlightElement()
+
+el$clickElement()
+
+el$sendKeysToElement(list('uid'))  #change to user ID
+el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
+el.1$highlightElement()
+
+el.1$sendKeysToElement(list('pid'))  #change to Pass ID
+el$sendKeysToElement(list(key='enter'))
+
+
+#temp <- main.df[sample(1:nrow(main.df),10),]
+#temp[,2:5]
+
+
+for (i in 1:nrow(main.df)){
+  main.df$Date_Time_acc[i] <- Sys.time()
+  remote_driver$navigate(main.df$URL.link[i])
+  print(main.df$URL.link[i])
+  
+  #insert system delay
+  
+  #Sys.sleep(sample(0:2,1))
+  
+  page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
+  
+  # below uses xpath to pull the site reported count
+  xpath.from.src <- '//*[@id="lblEnrollNon"]'  #xpath for total from the bottom of site page
+  
+  page %>% html_nodes(.,xpath=xpath.from.src)->node.out
+  
+  print(node.out)
+  site.enrolled.count<- html_text (node.out)
+  site.enrolled.count<- as.numeric(sub(",","",site.enrolled.count))
+  
+  main.df$site_enrol[i] <- site.enrolled.count
+  
+  # below uses xpath to pull the site reported count
+  
+  xpath.from.src.clustered <- '//*[@id="lblEnrollCluster"]'#clustered class table
+  page %>% html_nodes(.,xpath=xpath.from.src.clustered)->node.out
+  
+  print(node.out)
+  site.clust.enrolled.count<- html_text (node.out)
+  site.clust.enrolled.count<- as.numeric(sub(",","",site.clust.enrolled.count))
+  main.df$site_clus_enrol[i] <- site.clust.enrolled.count
+  
+  # full table
+  
+  xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
+  page %>% html_nodes(.,xpath=xpath.from.src)->table.out
+  
+  main.df$scrap_tbl[i]<- table.out %>% html_table(fill = T)
+  
+  
+  # clustered table
+  
+  xpath.from.src <- "/html/body/form/div[3]/table[2]" #xpath for clusterd classes
+  page %>% html_nodes(.,xpath=xpath.from.src)->table.out
+  
+  main.df$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
+  
+  print(paste("we are on iteration ",i))
+}
+save(main.df,file = "South_Canceled_classes.Rdata")
+
+
