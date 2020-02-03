@@ -15,20 +15,6 @@ library(tidyverse)
 library(lubridate)
 library(dplyr)
 ```
-#Key things to be done:
-
-1.confirm that the data matches a few of the website. 
-```{r load data, include=TRUE}
-load('seattle_col_enrol_thru_Win_2020.RData')
-df <- df.tot
-#rm(df.tot)
-
-df<- df %>% mutate(college=as.character(college)) %>% 
-  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
-
-```
-
-##A small project tracking enrollments
 
 ```{r setup, echo=FALSE, cache=FALSE}
 library(knitr)
@@ -45,6 +31,41 @@ opts_chunk$set(echo=FALSE,
                warning=FALSE)
 opts_knit$set(width=75)
 ```
+
+```{r load data, include=TRUE}
+load('seattle_col_enrol_thru_Win_2020.RData')
+df <- df.tot
+#rm(df.tot)
+```
+
+```{r stitch souths cancelled list, include =T}
+load('main.df')
+df.tot %>% filter(college == '064') %>% 
+  mutate(cancel = 
+           case_when
+  )
+  
+}
+#run qc code from read_enrollment to get list of codes
+cancelled_items
+
+
+
+
+```
+
+
+```{r mutate college name, include =T}
+df<- df %>% mutate(college=as.character(college)) %>% 
+  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
+
+```
+
+#Key things to be done:
+
+1.confirm that the data matches a few of the website. 
+
+##A small project tracking enrollments
 
 
 ##Some Data since 1985
