@@ -401,11 +401,11 @@ el$sendKeysToElement(list(key='enter'))
 #temp <- main.df[sample(1:nrow(main.df),10),]
 #temp[,2:5]
 
-
-for (i in 1:nrow(main.df)){
-  main.df$Date_Time_acc[i] <- Sys.time()
-  remote_driver$navigate(main.df$URL.link[i])
-  print(main.df$URL.link[i])
+canceled_items <- list()
+for (i in 1:nrow(South_link_list)){
+  
+  remote_driver$navigate(South_link_list[i,])
+  print(South_link_list[i,])
   
   #insert system delay
   
@@ -413,44 +413,20 @@ for (i in 1:nrow(main.df)){
   
   page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
   
-  # below uses xpath to pull the site reported count
-  xpath.from.src <- '//*[@id="lblEnrollNon"]'  #xpath for total from the bottom of site page
+  # below uses xpath to pull the canclled classes for all classes both clustered and non
   
-  page %>% html_nodes(.,xpath=xpath.from.src)->node.out
+  xpath.from.src <- '//*[@class="cancelled"]'  #xpath for total from the bottom of site page
   
-  print(node.out)
-  site.enrolled.count<- html_text (node.out)
-  site.enrolled.count<- as.numeric(sub(",","",site.enrolled.count))
+  canceled_items[[i]]<- page %>% html_nodes(.,xpath=xpath.from.src) %>% html_text() %>% str_trim() %>% substr(start=1,stop=4)
   
-  main.df$site_enrol[i] <- site.enrolled.count
+  #but then what?  I just to note them and cross walk them to original using item number + courseId? 
+  #which means I don't need to tidy/clean the whole row, I just need to pull the first 2 columns (maybe just item.  )
+ # ->table.out
   
-  # below uses xpath to pull the site reported count
-  
-  xpath.from.src.clustered <- '//*[@id="lblEnrollCluster"]'#clustered class table
-  page %>% html_nodes(.,xpath=xpath.from.src.clustered)->node.out
-  
-  print(node.out)
-  site.clust.enrolled.count<- html_text (node.out)
-  site.clust.enrolled.count<- as.numeric(sub(",","",site.clust.enrolled.count))
-  main.df$site_clus_enrol[i] <- site.clust.enrolled.count
-  
-  # full table
-  
-  xpath.from.src <- "/html/body/form/div[3]/table[1]" #xpath for non-clusterd classes
-  page %>% html_nodes(.,xpath=xpath.from.src)->table.out
-  
-  main.df$scrap_tbl[i]<- table.out %>% html_table(fill = T)
-  
-  
-  # clustered table
-  
-  xpath.from.src <- "/html/body/form/div[3]/table[2]" #xpath for clusterd classes
-  page %>% html_nodes(.,xpath=xpath.from.src)->table.out
-  
-  main.df$scrap__clust_tbl[i]<- table.out %>% html_table(fill = T)
+ # main.df$scrap_tbl[i]<- table.out %>% html_table(fill = T)
   
   print(paste("we are on iteration ",i))
 }
-save(main.df,file = "South_Canceled_classes.Rdata")
+save(canceled_items,file = "South_Canceled_classes.Rdata")
 
 
