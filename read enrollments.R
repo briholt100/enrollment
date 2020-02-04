@@ -1,4 +1,5 @@
 library(tidyverse)
+library(dplyr)
 library(lubridate)
 library(microbenchmark)
 # Components of dataframe -------------------------------------------------
@@ -373,3 +374,59 @@ df.tot<- df.tot %>%
 
 save(df.tot,file='seattle_col_enrol_thru_Win_2020.RData')
   
+
+
+# Fix South's cancelling labeling. ----------------------------------------
+
+load('main.df.b.RData')
+South_link_list <- main.df %>% filter(college=='064') %>% select(URL.link) 
+
+South_canceled_main.df <- main.df[0,c(1:5,8,11)]
+
+
+
+el<- remote_driver$findElement(using='xpath', '//*[@id="TxSID"]')
+el$highlightElement()
+
+el$clickElement()
+
+el$sendKeysToElement(list('uid'))  #change to user ID
+el.1 <- remote_driver$findElement(using = 'xpath', '//*[@id="TxPIN"]')
+el.1$highlightElement()
+
+el.1$sendKeysToElement(list('pid'))  #change to Pass ID
+el$sendKeysToElement(list(key='enter'))
+
+
+#temp <- main.df[sample(1:nrow(main.df),10),]
+#temp[,2:5]
+
+canceled_items <- list()
+for (i in 1:nrow(South_link_list)){
+  
+  remote_driver$navigate(South_link_list[i,])
+  print(South_link_list[i,])
+  
+  #insert system delay
+  
+  #Sys.sleep(sample(0:2,1))
+  
+  page<- remote_driver$getPageSource() %>% .[[1]] %>% read_html()
+  
+  # below uses xpath to pull the canclled classes for all classes both clustered and non
+  
+  xpath.from.src <- '//*[@class="cancelled"]'  #xpath for total from the bottom of site page
+  
+  canceled_items[[i]]<- page %>% html_nodes(.,xpath=xpath.from.src) %>% html_text() %>% str_trim() %>% substr(start=1,stop=4)
+  
+  #but then what?  I just to note them and cross walk them to original using item number + courseId? 
+  #which means I don't need to tidy/clean the whole row, I just need to pull the first 2 columns (maybe just item.  )
+ # ->table.out
+  
+ # main.df$scrap_tbl[i]<- table.out %>% html_table(fill = T)
+  
+  print(paste("we are on iteration ",i))
+}
+save(canceled_items,file = "South_Canceled_classes.Rdata")
+
+
