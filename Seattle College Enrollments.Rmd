@@ -3,10 +3,10 @@ title: "Seattle College Enrollments"
 author: "Brian Holt"
 date: "1/26/2020"
 output:
+  pdf_document: default
   rmdformats::html_clean:
     TOC: yes
     highlight: kate
-  pdf_document: default
   html_document:
     df_print: paged
 ---
