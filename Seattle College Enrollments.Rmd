@@ -47,43 +47,27 @@ load('South_Canceled_classes.Rdata')
 cancel_short_list <- canceled_items[lapply(canceled_items,length)>0]
 
 
+for (i in 1:length(names(cancel_short_list))){
+  for(j in 1:length(cancel_short_list[[i]])){
+  #  print(length(cancel_short_list[[i]]))
+  df[df$college == '064' & df$code == names(cancel_short_list)[i] ,'cancel']  <- ifelse(
+    df[df$college == '064' & df$code == names(cancel_short_list)[i] ,'Item'] %in% cancel_short_list[[i]],
+     1,0 )
+#df[df$college == '064' & df$code == names(cancel_short_list)[i],c(1,2,5,23)]
+  }
+}
+
+for (i in 1:length(names(cancel_short_list))){
+  print (df[df$college == '064' & df$code == names(cancel_short_list)[i] & df$cancel != 0,c(1,2,5,23)])
+  }
+
 
 
 
 # =======================
 #   this gets to some of thelogic
-
-for (i in 1:nrow(df[df$college=='064',])){
-  if(df$code[df$college=='064'][i] %in% 
-      names(cancel_short_list)){
-    
-     print(df$code[i])
-    
-      print(df[i,2:5])
-  }
-}
-
-
-for (i in 1:nrow(df[df$college=='064',])){
-  if(df$code[df$college=='064'][i] %in% 
-     names(cancel_short_list)){
-    for (j in 1:length(paste(cancel_short_list,'$',df$code)))
-    {if(df$Item[i] %in% cancel_short_list[[j]])
-      print}
-    print(df$code[i])
-    
-    print(df[i,2:5])
-  }
-}
-
-# =======================
-
-
-for ( i in 1:length(cancel_short_list)){
-  if(main.df$code==cancel_short_list[i])
-    {print(main.df$site_enrol)}
-}
-
+df %>% filter(college=='064') %>% summarise(sum(cancel))
+df %>% filter(college=='064') %>% select(college,code,Item,cancel) %>% filter(cancel>0)
 
 ```
 
