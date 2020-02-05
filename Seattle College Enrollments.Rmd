@@ -40,16 +40,23 @@ df <- df.tot
 
 ```{r stitch souths cancelled list, include =T}
 load('main.df')
-df.tot %>% filter(college == '064') %>% 
-  mutate(cancel = 
-           case_when
-  )
-  
+
+# Merging canceled classes to main.df -------------------------------------
+
+cancel_short_list <- canceled_items[lapply(canceled_items,length)>0]
+
+
+
+main.df %>% filter(college=='064') %>% 
+  mutate(cancel=
+           case_when(code == cancel_short_list)
+         
+)
+
+for ( i in 1:length(cancel_short_list)){
+  if(main.df$code==cancel_short_list[i])
+    {print(main.df$site_enrol)}
 }
-#run qc code from read_enrollment to get list of codes
-cancelled_items
-
-
 
 
 ```
