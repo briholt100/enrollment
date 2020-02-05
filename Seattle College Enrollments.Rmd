@@ -40,6 +40,7 @@ df <- df.tot
 
 ```{r stitch souths cancelled list, include =T}
 load('main.df')
+load('South_Canceled_classes.Rdata')
 
 # Merging canceled classes to main.df -------------------------------------
 
@@ -47,11 +48,36 @@ cancel_short_list <- canceled_items[lapply(canceled_items,length)>0]
 
 
 
-main.df %>% filter(college=='064') %>% 
-  mutate(cancel=
-           case_when(code == cancel_short_list)
-         
-)
+
+
+# =======================
+#   this gets to some of thelogic
+
+for (i in 1:nrow(df[df$college=='064',])){
+  if(df$code[df$college=='064'][i] %in% 
+      names(cancel_short_list)){
+    
+     print(df$code[i])
+    
+      print(df[i,2:5])
+  }
+}
+
+
+for (i in 1:nrow(df[df$college=='064',])){
+  if(df$code[df$college=='064'][i] %in% 
+     names(cancel_short_list)){
+    for (j in 1:length(paste(cancel_short_list,'$',df$code)))
+    {if(df$Item[i] %in% cancel_short_list[[j]])
+      print}
+    print(df$code[i])
+    
+    print(df[i,2:5])
+  }
+}
+
+# =======================
+
 
 for ( i in 1:length(cancel_short_list)){
   if(main.df$code==cancel_short_list[i])
