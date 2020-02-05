@@ -38,7 +38,7 @@ df <- df.tot
 #rm(df.tot)
 ```
 
-```{r stitch souths cancelled list, include =T}
+```{r stitch souths cancelled list, eval= =F}
 load('main.df')
 load('South_Canceled_classes.Rdata')
 
@@ -61,7 +61,7 @@ for (i in 1:length(names(cancel_short_list))){
   print (df[df$college == '064' & df$code == names(cancel_short_list)[i] & df$cancel != 0,c(1,2,5,23)])
   }
 
-
+save(df, file='seattle_col_enrol_thru_Win_2020.RData')
 
 
 # =======================
