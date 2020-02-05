@@ -58,7 +58,7 @@ for (i in 1:length(names(cancel_short_list))){
 }
 
 for (i in 1:length(names(cancel_short_list))){
-  print (df[df$college == '064' & df$code == names(cancel_short_list)[i] & df$cancel != 0,c(1,2,5,23)])
+  print (df[df$college == '064' & df$code == names(cancel_short_list)[i] & df$cancel != 0,c(1:5,23)])
   }
 
 save(df, file='seattle_col_enrol_thru_Win_2020.RData')
