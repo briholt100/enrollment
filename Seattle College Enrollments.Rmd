@@ -33,14 +33,14 @@ opts_knit$set(width=75)
 ```
 
 ```{r load data, include=TRUE}
-load('seattle_col_enrol_thru_Win_2020.RData')
-df <- df.tot
+load('seattle_col_enrol_thru_Win_2020.RData')  #this appears to have the canceled classes added already. 81 
+#df <- df.tot  #not sure where df.tot comes from?  read_enrollments?
 #rm(df.tot)
 ```
 
-```{r stitch souths cancelled list, eval= =F}
-load('main.df')
-load('South_Canceled_classes.Rdata')
+```{r stitch souths cancelled list, eval= F}
+load('main.df') #is nested dataframe
+load('South_Canceled_classes.Rdata') #quart by quart list of south cancelled items
 
 # Merging canceled classes to main.df -------------------------------------
 
