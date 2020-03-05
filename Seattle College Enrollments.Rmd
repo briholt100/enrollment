@@ -163,3 +163,25 @@ After dropping classes where class size is equal to zero (about 52,300 of them, 
 df %>% select(college,code,Season,yr,Date,Enrolled,Class.Size) %>% mutate(ratio=Enrolled/Class.Size,Date=year(Date)) %>% filter(ratio!=Inf,Season!="Summer") %>% group_by(college,Season,Date) %>% summarise(mean_ratio=mean(ratio)) %>% ggplot(aes(x=Date,y=mean_ratio,color=Season)) +geom_line()+facet_grid(~college)+ggtitle("")
 
 ```
+
+##Comparison to unemployment
+
+```{r, load unemployment for king count, include=T}
+uemp.rate<- read.csv('../Data/wa_king_unemp_rate.csv',header=T,stringsAsFactors = F)
+
+colnames(uemp.rate) <- c("Date","unem.rate")
+uemp.rate$Date<- parse_date_time(uemp.rate$Date,'%m/%d/%Y',tz="America/Los_Angeles")
+uemp.rate$Date <- ymd(uemp.rate$Date)
+
+```
+
+
+
+```{r compare State FTE to unemployemnt rate over time, include=T,fig.dim=c(6,4)}
+df %>% select(college,Date,code,yr,Enrolled,State.FTES,Season) %>% 
+    filter(Season!="Summer", as.integer(yr)>00 & as.integer(yr)<30 ) %>% group_by(college,Date) %>% 
+  summarise(State_FTE_tot=sum(State.FTES)) %>% 
+  ggplot(aes(x=Date,y=State_FTE_tot))+geom_line()+facet_grid(~college)+ggtitle("Total State FTE's")+geom_smooth()+
+  geom_line(data=uemp.rate,aes(x=Date,y=unem.rate*500,color='red'))+ggtitle("Red line represents unemployment rate in king county\n multiplied by 500 (to make it fit on graph)")#+theme(legend.position = "none")
+
+```
