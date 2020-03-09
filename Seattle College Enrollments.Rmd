@@ -34,7 +34,7 @@ opts_knit$set(width=75)
 
 ```{r load data, include=TRUE}
 load('seattle_col_enrol_thru_Win_2020.RData')  #this appears to have the canceled classes added already. 81 
-#df <- df.tot  #not sure where df.tot comes from?  read_enrollments?
+df <- df.tot  #not sure where df.tot comes from?  read_enrollments?
 #rm(df.tot)
 ```
 
@@ -74,7 +74,8 @@ df %>% filter(college=='064') %>% select(college,code,Item,cancel) %>% filter(ca
 
 ```{r mutate college name, include =T}
 df<- df %>% mutate(college=as.character(college)) %>% 
-  mutate(college = as.factor(ifelse(college=='062',"Central",ifelse(college=='063',"North","South"))))
+  mutate(college = as.factor(ifelse(
+    college=='062',"Central",ifelse(college=='063',"North","South"))))
 
 ```
 
@@ -167,11 +168,12 @@ df %>% select(college,code,Season,yr,Date,Enrolled,Class.Size) %>% mutate(ratio=
 ##Comparison to unemployment
 
 ```{r, load unemployment for king count, include=T}
-uemp.rate<- read.csv('../Data/wa_king_unemp_rate.csv',header=T,stringsAsFactors = F)
+url='https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=1168&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id=WAKING5URN&scale=left&cosd=1990-01-01&coed=2019-12-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Monthly&fam=avg&fgst=lin&fgsnd=2009-06-01&line_index=1&transformation=lin&vintage_date=2020-03-09&revision_date=2020-03-09&nd=1990-01-01'
 
+uemp.rate<-read.csv(url)
 colnames(uemp.rate) <- c("Date","unem.rate")
-uemp.rate$Date<- parse_date_time(uemp.rate$Date,'%m/%d/%Y',tz="America/Los_Angeles")
-uemp.rate$Date <- ymd(uemp.rate$Date)
+uemp.rate$Date<-as.character(uemp.rate$Date)
+uemp.rate$Date<- ymd(uemp.rate$Date)
 
 ```
 
